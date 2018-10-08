@@ -1,0 +1,1 @@
+from lib.image_proccesing.video_input import VideoInput
