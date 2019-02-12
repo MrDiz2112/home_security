@@ -1,7 +1,7 @@
 import numpy as np
 
 from pyqtgraph import ImageView
-from PyQt5.QtCore import Qt, QTimer, QThread
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtWidgets import *
 
 from Views.MovieThread import MovieThread
@@ -40,6 +40,7 @@ class MainWindow(QMainWindow):
         self.image_view.setImage(frame.T)
 
     def update_movie(self):
+        self.update_image()
         self.image_view.setImage(self.camera.last_frame.T)
 
     def update_brightness(self, value):
