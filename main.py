@@ -1,4 +1,12 @@
-from lib.image_proccesing import VideoInput
+from PyQt5.QtWidgets import QApplication
 
-if __name__ == '__main__':
-    pass
+from Models import CameraModel
+from Views import MainWindow
+
+camera = CameraModel(0)
+camera.initialize()
+
+app = QApplication([])
+start_window = MainWindow(camera)
+start_window.show()
+app.exit(app.exec_())
