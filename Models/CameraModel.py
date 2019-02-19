@@ -1,47 +1,24 @@
 import cv2
 import numpy as np
+from PyQt5 import QtCore
 
 
-class CameraModel:
-    def __init__(self, cam_num):
-        self.cam_num = cam_num
-        self.cap = None
-        self.last_frame = np.zeros((1,1))
+class CameraModel(QtCore.QObject):
+    image_data = QtCore.pyqtSignal(np.ndarray)
 
-    def initialize(self):
-        self.cap = cv2.VideoCapture(self.cam_num)
+    def __init__(self, camera_port=0, parent=None):
+        super().__init__(parent)
+        self.camera = cv2.VideoCapture(camera_port)
 
-    def get_frame(self):
-        ret, self.last_frame = self.cap.read()
-        return self.last_frame
+        self.timer = QtCore.QBasicTimer()
 
-    def acquire_movie(self, num_frames):
-        movie = []
-        for _ in range(num_frames):
-            movie.append(self.get_frame())
-        return movie
+    def start_recording(self):
+        self.timer.start(0, self)
 
-    def set_brightness(self, value):
-        self.cap.set(cv2.CAP_PROP_BRIGHTNESS, value)
+    def timerEvent(self, event):
+        if (event.timerId() != self.timer.timerId()):
+            return
 
-    def get_brightness(self):
-        return self.cap.get(cv2.CAP_PROP_BRIGHTNESS)
-
-    def close_camera(self):
-        self.cap.release()
-
-    def __str__(self):
-        return 'OpenCV Camera {}'.format(self.cam_num)
-
-
-if __name__ == '__main__':
-    cam = CameraModel(0)
-    cam.initialize()
-    print(cam)
-    frame = cam.get_frame()
-    print(frame)
-    cam.set_brightness(1)
-    print(cam.get_brightness())
-    cam.set_brightness(0.5)
-    print(cam.get_brightness())
-    cam.close_camera()
+        read, data = self.camera.read()
+        if read:
+            self.image_data.emit(data)

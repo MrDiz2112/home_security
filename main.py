@@ -1,12 +1,21 @@
-from PyQt5.QtWidgets import QApplication
+import os
+import sys
 
-from Models import CameraModel
+from PyQt5 import QtWidgets
 from Views import MainWindow
 
-camera = CameraModel(0)
-camera.initialize()
 
-app = QApplication([])
-start_window = MainWindow(camera)
-start_window.show()
-app.exit(app.exec_())
+def launch(haar_cascade_filepath):
+    app = QtWidgets.QApplication(sys.argv)
+
+    main_window = MainWindow(haar_cascade_filepath)
+    main_window.show()
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    script_dir = os.path.dirname(os.path.realpath(__file__))
+    cascade_filepath = os.path.join('haarcascade_frontalface_default.xml')
+
+    cascade_filepath = os.path.abspath(cascade_filepath)
+    launch(cascade_filepath)
