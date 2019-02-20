@@ -12,7 +12,7 @@ class CameraModel(QtCore.QObject):
 
         self.timer = QtCore.QBasicTimer()
 
-    def start_recording(self):
+    def start_video(self):
         self.timer.start(0, self)
 
     def timerEvent(self, event):

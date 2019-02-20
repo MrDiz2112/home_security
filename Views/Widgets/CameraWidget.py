@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
 from PyQt5 import QtWidgets, QtGui
+from PyQt5.QtWidgets import QSizePolicy
 
 
-class VideoWidget(QtWidgets.QWidget):
+class CameraWidget(QtWidgets.QWidget):
     def __init__(self, haar_cascade_filepath, parent=None):
         super().__init__(parent)
         self.classifier = cv2.CascadeClassifier(haar_cascade_filepath)
@@ -11,6 +12,7 @@ class VideoWidget(QtWidgets.QWidget):
         self._red = (0, 0, 255)
         self._width = 2
         self._min_size = (30, 30)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     def detect_faces(self, image: np.ndarray):
         # haarclassifiers work better in black and white

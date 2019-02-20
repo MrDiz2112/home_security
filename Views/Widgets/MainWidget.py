@@ -1,14 +1,14 @@
 from PyQt5 import QtWidgets
 
 from Models import CameraModel
-from Views.Widgets import VideoWidget
+from Views.Widgets import CameraWidget
 
 
 class MainWidget(QtWidgets.QWidget):
     def __init__(self, haarcascade_filepath, parent=None):
         super().__init__(parent)
         fp = haarcascade_filepath
-        self.face_detection_widget = VideoWidget(fp)
+        self.face_detection_widget = CameraWidget(fp)
 
         # TODO: set video port
         self.record_video = CameraModel()
@@ -22,5 +22,5 @@ class MainWidget(QtWidgets.QWidget):
         self.run_button = QtWidgets.QPushButton('Start')
         layout.addWidget(self.run_button)
 
-        self.run_button.clicked.connect(self.record_video.start_recording)
+        self.run_button.clicked.connect(self.record_video.start_video)
         self.setLayout(layout)
