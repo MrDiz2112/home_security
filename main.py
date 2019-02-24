@@ -2,13 +2,13 @@ import os
 import sys
 
 from PyQt5 import QtWidgets
-from Presenter import MainWindowPresenter
+from Views import MainWindowView
 
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
 
-    main_window = MainWindowPresenter()
+    main_window = MainWindowView()
     main_window.show()
 
     sys.exit(app.exec_())
