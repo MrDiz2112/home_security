@@ -10,7 +10,7 @@ class MainWindowPresenter:
         self.view = view
 
         # TODO: выбор порта
-        self.cameraModel = CameraModel(FaceDetectionConfig.cascade_path)
+        self.cameraModel = CameraModel(FaceDetectionConfig.cascade_path, r"materials/thief1.mp4")
 
     def get_camera_image(self):
         is_display_processing = self.view.displayProcessingCheckBox.isChecked()

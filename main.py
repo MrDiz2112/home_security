@@ -14,4 +14,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except:
+        type, value, traceback = sys.exc_info()
+        print('Error opening %s: %s' % (value.filename, value.strerror))

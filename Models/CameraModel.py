@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from PyQt5 import QtCore, QtGui
 
-from Models import FaceDetectionModel
+from Models import FaceDetectionModel, MotionDetectionModel
 
 
 class CameraModel(QtCore.QObject):
@@ -12,10 +12,12 @@ class CameraModel(QtCore.QObject):
         super().__init__(parent)
         self.camera = cv2.VideoCapture(camera_port)
 
-        self._colorFace = (0, 0, 255)
+        self._colorFace = (0, 255, 182)
+        self._colorMotion = (0, 0, 255)
         self._thickness = 2
 
         self._face_detection_model = FaceDetectionModel(cascade_filepath)
+        self._motion_detection_model = MotionDetectionModel()
 
     # Методы для View
 
@@ -43,14 +45,26 @@ class CameraModel(QtCore.QObject):
         :param image_data: изображение np.array
         :return: обработанное изображение  QImage
         """
+        self.detect_motion(image_data)
         self.detect_faces(image_data)
 
         image = self.get_qimage(image_data)
 
         return image
 
-    # TODO: возвращать прямоугольники для распознавания лица
-    def detect_faces(self, image_data) -> List[np.ndarray]:
+    # TODO: возвращать ROI для нахождения лиц
+    def detect_motion(self, image_data):
+        motion = self._motion_detection_model.detect_motion(image_data)
+
+        for (x, y, w, h) in motion:
+            cv2.rectangle(image_data,
+                          (x, y),
+                          (x + w, y + h),
+                          self._colorMotion,
+                          self._thickness)
+
+    # TODO: возвращать ROI для распознавания лица
+    def detect_faces(self, image_data):
         """
         Возвращает список ROI с лицами
         :param image_data: исходное изображение
