@@ -1,1 +1,2 @@
+from Models.FaceDetectionModel import FaceDetectionModel
 from Models.CameraModel import CameraModel

@@ -21,6 +21,13 @@
        <layout class="QVBoxLayout" name="cameraImageLayout"/>
       </item>
       <item>
+       <widget class="Line" name="line_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="cameraSettingsLayout">
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
@@ -89,9 +96,29 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QCheckBox" name="displayProcessingCheckBox">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Показать результат обработки</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
     </item>
     <item>
      <layout class="QVBoxLayout" name="settingsLayout">

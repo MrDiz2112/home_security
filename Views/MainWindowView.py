@@ -1,20 +1,35 @@
 import Views.Widgets
-from Configuration import FaceDetectionConfig
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 
 from Presenter import MainWindowPresenter
 
 
 class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
     def __init__(self):
-        # Это здесь нужно для доступа к переменным, методам
-        # и т.д. в файле design.py
         super().__init__()
-        self.setupUi(self)  # Это нужно для инициализации нашего дизайна
+        self.setupUi(self)
 
-        # self.cameraWidget = Views.Widgets.CameraWidget(FaceDetectionConfig.cascade_path)
-        self.cameraWidget = Views.Widgets.CameraWidget(FaceDetectionConfig.cascade_path)
+        # Вспомгательные поля
+        self.timer = QtCore.QBasicTimer()
+
+        # Поля виджетов
+        self.cameraWidget = Views.Widgets.CameraWidget()
         self.cameraImageLayout.addWidget(self.cameraWidget)
 
+        # Поля патерна MVP
         self.presenter = MainWindowPresenter(self)
+
+        # Назначение функций
+        self.startButton.clicked.connect(self.start_video)
+
+    def start_video(self):
+        self.timer.start(0, self)
+
+    def timerEvent(self, event):
+        if event.timerId() != self.timer.timerId():
+            return
+
+        self.presenter.get_camera_image()
+
+        self.update()

@@ -1,3 +1,4 @@
+from Configuration import FaceDetectionConfig
 from Models import CameraModel
 
 from Views import MainWindowView
@@ -8,10 +9,15 @@ class MainWindowPresenter:
 
         self.view = view
 
-        # TODO: set video port
-        self.cameraModel = CameraModel()
+        # TODO: выбор порта
+        self.cameraModel = CameraModel(FaceDetectionConfig.cascade_path)
 
-        image_data_slot = view.cameraWidget.image_data_slot
-        self.cameraModel.image_data.connect(image_data_slot)
+    def get_camera_image(self):
+        is_display_processing = self.view.displayProcessingCheckBox.isChecked()
 
-        view.startButton.clicked.connect(self.cameraModel.start_video)
+        image = self.cameraModel.get_camera_image(is_display_processing)
+
+        self.view.cameraWidget.image = image
+
+        if self.view.cameraWidget.image.size() != self.view.cameraWidget.size():
+            self.view.cameraWidget.setFixedSize(self.view.cameraWidget.image.size())

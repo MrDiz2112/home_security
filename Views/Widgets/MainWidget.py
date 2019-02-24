@@ -14,7 +14,7 @@ class MainWidget(QtWidgets.QWidget):
         self.record_video = CameraModel()
 
         image_data_slot = self.face_detection_widget.image_data_slot
-        self.record_video.image_data.connect(image_data_slot)
+        self.record_video.new_frame_signal.connect(image_data_slot)
 
         layout = QtWidgets.QVBoxLayout()
 
