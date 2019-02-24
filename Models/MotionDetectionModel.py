@@ -36,8 +36,13 @@ class MotionDetectionModel:
             movObject = IOps.CreateMovingObject(f0, f1, f2)
 
             # Контуры
-            contours, hierarchy = cv2.findContours(np.copy(movObject),
+            contours = cv2.findContours(np.copy(movObject),
                                                    cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            if cv2.__version__[0] != '4':
+                contours = contours[1]
+            else:
+                contours = contours[0]
 
             contours_big = []
 
