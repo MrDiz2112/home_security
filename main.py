@@ -42,8 +42,4 @@ def init_logger(now_date):
 
 
 if __name__ == '__main__':
-    try:
-        main()
-    except:
-        type, value, traceback = sys.exc_info()
-        print('Error opening %s: %s' % (value.filename, value.strerror))
+    main()
