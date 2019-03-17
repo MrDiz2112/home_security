@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import logging
 import numpy as np
@@ -8,13 +10,14 @@ from Core import Manager
 
 
 class CameraThread(QThread):
-    def __init__(self, cam_port: int, manager: Manager):
+    def __init__(self, cam_port: int, fps: float, manager: Manager):
         super().__init__()
 
         self.__cam = None
         self.__manager: Manager = manager
         self.__is_running: bool = False
         self.__cam_port: int = cam_port
+        self.__frame_wait = 1/ fps
 
     def run(self):
         if self.__manager is None:
@@ -29,10 +32,18 @@ class CameraThread(QThread):
         self.__cam_thread_info(f"Start frame grabber")
 
         while self.__is_running:
+            start_time = time.time()
+
             res, frame = self.__cam.read()
 
             if res:
                 self.__manager.put_frame(frame)
+
+                end_time = time.time()
+
+                if end_time - start_time < self.__frame_wait:
+                    time.sleep(self.__frame_wait - (end_time - start_time))
+
                 continue
 
             # If failed

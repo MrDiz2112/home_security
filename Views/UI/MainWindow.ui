@@ -18,7 +18,27 @@
     <item>
      <layout class="QVBoxLayout" name="cameraLayout">
       <item>
-       <layout class="QVBoxLayout" name="cameraImageLayout"/>
+       <layout class="QVBoxLayout" name="cameraImageLayout">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <item>
+         <widget class="QLabel" name="cameraImage">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="Line" name="line_3">
@@ -41,7 +61,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Отобразить область интереса</string>
+           <string>Отобразить ROI</string>
           </property>
          </widget>
         </item>
@@ -49,7 +69,7 @@
          <widget class="QPushButton" name="newRoiButton">
           <property name="minimumSize">
            <size>
-            <width>150</width>
+            <width>180</width>
             <height>0</height>
            </size>
           </property>
@@ -68,7 +88,7 @@
          <widget class="QPushButton" name="editRoiButton">
           <property name="minimumSize">
            <size>
-            <width>150</width>
+            <width>180</width>
             <height>0</height>
            </size>
           </property>
@@ -132,7 +152,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>180</width>
           <height>0</height>
          </size>
         </property>
@@ -170,7 +190,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>180</width>
           <height>0</height>
          </size>
         </property>
@@ -195,7 +215,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>180</width>
           <height>0</height>
          </size>
         </property>
@@ -220,7 +240,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>180</width>
           <height>0</height>
          </size>
         </property>
@@ -245,7 +265,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>150</width>
+          <width>180</width>
           <height>0</height>
          </size>
         </property>
@@ -270,7 +290,7 @@
      <x>0</x>
      <y>0</y>
      <width>1007</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

@@ -16,6 +16,7 @@ class CameraUiThread(QThread):
         self.__get_frame: Callable[[], np.ndarray] = None
 
     def assign_caller(self, method: Callable[[], np.ndarray]):
+        self.__ui_thread_info(f"Assigned caller {method.__name__}")
         self.__get_frame = method
 
     def run(self):

@@ -2,7 +2,8 @@ import logging
 
 import Views.Widgets
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 
 from Presenter import MainWindowPresenter
 
@@ -12,21 +13,21 @@ class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
         super().__init__()
         self.setupUi(self)
 
-        # Поля виджетов
-        self.cameraWidget = Views.Widgets.CameraWidget()
-        self.cameraImageLayout.addWidget(self.cameraWidget)
-
         # Поля патерна MVP
         self.__presenter = MainWindowPresenter(self)
 
         # Назначение функций
         self.startButton.clicked.connect(self.start_video)
 
+        # Настройка виджетов
+        self.cameraImage.setAutoFillBackground(True)
+        cameraImage_palete =self.cameraImage.palette()
+        cameraImage_palete.setColor(self.cameraImage.backgroundRole(), Qt.black)
+        self.cameraImage.setPalette(cameraImage_palete)
+
     def start_video(self):
         self.__presenter.start_camera()
         self.__ui_info("Start camera")
-
-        # self.update()
 
     def __ui_info(self, msg:str):
         message = f"[UI] {msg}"

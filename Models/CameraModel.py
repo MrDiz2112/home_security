@@ -6,17 +6,18 @@ from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QThread
 
 from Core import Manager
-from Core.Threads import CameraThread, CameraUiThread
+from Core.Threads import CameraThread
 from Models import FaceDetectionModel, MotionDetectionModel
-from Views.Widgets import CameraWidget
 
 
 class CameraModel(QtCore.QObject):
-    def __init__(self, cascade_filepath: str, camera_port: int, manager: Manager):
+    def __init__(self, cascade_filepath: str, camera_port: int, fps: float, manager: Manager):
         super().__init__()
 
         self.__manager = manager
-        self.__camera_thread = CameraThread(camera_port, self.__manager)
+        self.__fps = fps
+
+        self.__camera_thread = CameraThread(camera_port, self.__fps, self.__manager)
 
         self._colorFace = (0, 255, 182)
         self._colorMotion = (0, 0, 255)

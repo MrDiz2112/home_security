@@ -1,6 +1,6 @@
 import logging
 
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtGui import QImage, QPixmap
 
 from Configuration import FaceDetectionConfig
@@ -18,7 +18,10 @@ class MainWindowPresenter:
 
         # TODO: выбор порта
         self.__manager: Manager = Manager()
-        self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path, r"materials/thief1.mp4", self.__manager)
+
+        fps = 25.0
+
+        self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path, r"materials/thief1.mp4", fps, self.__manager)
 
         self.__camera_ui_thread = CameraUiThread()
 
@@ -36,10 +39,17 @@ class MainWindowPresenter:
 
     @pyqtSlot(QImage)
     def __update_camera_widget_image(self, image):
-        self.view.cameraWidget.image = QPixmap.fromImage(image)
+        pixmap = QPixmap.fromImage(image)
+        pixmap = pixmap.scaled(self.view.cameraImage.width(), self.view.cameraImage.height(), Qt.KeepAspectRatio)
 
-        if self.view.cameraWidget.image.size() != self.view.cameraWidget.size():
-            self.view.cameraWidget.image.setFixedSize(self.view.cameraWidget.size())
+        self.view.cameraImage.setPixmap(pixmap)
+
+        # if self.view.cameraWidget.image.size() != self.view.cameraWidget.size():
+        #     self.view.cameraWidget.image.setFixedSize(self.view.cameraWidget.size())
+
+        # self.view.cameraImage = self.view.cameraImage.scaled(self.view.cameraWidget.image.width(),
+        #                                                                    self.view.cameraWidget.image.height(),
+        #                                                                    Qt.KeepAspectRatio)
 
         self.view.update()
 
