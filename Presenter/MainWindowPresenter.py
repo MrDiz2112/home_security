@@ -21,9 +21,13 @@ class MainWindowPresenter:
 
         fps = 25.0
 
-        self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path, r"materials/thief1.mp4", fps, self.__manager)
-
         self.__camera_ui_thread = CameraUiThread()
+        self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path,
+                                         r"materials/thief1.mp4",
+                                         fps,
+                                         self.__manager)
+
+        self.__cameraModel.on_thread_finished.connect(self.__reset_camera)
 
     def start_camera(self):
         self.__presenter_info("Start camera init")
@@ -37,24 +41,29 @@ class MainWindowPresenter:
         self.__camera_ui_thread.on_new_image.connect(self.__update_camera_widget_image)
         self.__camera_ui_thread.start()
 
+        self.view.startButton.setEnabled(False)
+        self.view.stopButton.setEnabled(True)
+
+    def stop_camera(self):
+        self.__cameraModel.stop_frame_grabber()
+
+    def switch_mode(self):
+        pass
+
     @pyqtSlot(QImage)
     def __update_camera_widget_image(self, image):
         pixmap = QPixmap.fromImage(image)
         pixmap = pixmap.scaled(self.view.cameraImage.width(), self.view.cameraImage.height(), Qt.KeepAspectRatio)
 
         self.view.cameraImage.setPixmap(pixmap)
-
-        # if self.view.cameraWidget.image.size() != self.view.cameraWidget.size():
-        #     self.view.cameraWidget.image.setFixedSize(self.view.cameraWidget.size())
-
-        # self.view.cameraImage = self.view.cameraImage.scaled(self.view.cameraWidget.image.width(),
-        #                                                                    self.view.cameraWidget.image.height(),
-        #                                                                    Qt.KeepAspectRatio)
-
         self.view.update()
 
-    def switch_mode(self):
-        pass
+    @pyqtSlot()
+    def __reset_camera(self):
+        self.__manager.clear_manager()
+
+        self.view.startButton.setEnabled(True)
+        self.view.stopButton.setEnabled(False)
 
     def __presenter_info(self, msg:str):
         message = f"[MainWindowPresenter] {msg}"

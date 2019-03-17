@@ -18,6 +18,7 @@ class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
 
         # Назначение функций
         self.startButton.clicked.connect(self.start_video)
+        self.stopButton.clicked.connect(self.stop_video)
 
         # Настройка виджетов
         self.cameraImage.setAutoFillBackground(True)
@@ -27,7 +28,11 @@ class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
 
     def start_video(self):
         self.__presenter.start_camera()
-        self.__ui_info("Start camera")
+        self.__ui_info("Start video recording")
+
+    def stop_video(self):
+        self.__presenter.stop_camera()
+        self.__ui_info("Stop video recording")
 
     def __ui_info(self, msg:str):
         message = f"[UI] {msg}"

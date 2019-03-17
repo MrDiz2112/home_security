@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1007</width>
+    <width>1000</width>
     <height>700</height>
    </rect>
   </property>
@@ -41,13 +41,6 @@
        </layout>
       </item>
       <item>
-       <widget class="Line" name="line_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="cameraSettingsLayout">
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
@@ -75,7 +68,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>150</width>
+            <width>250</width>
             <height>16777215</height>
            </size>
           </property>
@@ -94,7 +87,7 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>150</width>
+            <width>250</width>
             <height>16777215</height>
            </size>
           </property>
@@ -116,29 +109,9 @@
           </property>
          </spacer>
         </item>
-        <item>
-         <widget class="QCheckBox" name="displayProcessingCheckBox">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string>Показать результат обработки</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-     </widget>
     </item>
     <item>
      <layout class="QVBoxLayout" name="settingsLayout">
@@ -158,12 +131,34 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>250</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="text">
          <string>Старт</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="stopButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>250</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Стоп</string>
         </property>
        </widget>
       </item>
@@ -196,37 +191,12 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>250</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="text">
          <string>База лиц</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>180</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -246,12 +216,25 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>250</width>
           <height>16777215</height>
          </size>
         </property>
         <property name="text">
          <string>Настройка оповещений</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="displayProcessingCheckBox">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Показать результат обработки</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -271,7 +254,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>250</width>
           <height>16777215</height>
          </size>
         </property>
@@ -289,7 +272,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1007</width>
+     <width>1000</width>
      <height>22</height>
     </rect>
    </property>
