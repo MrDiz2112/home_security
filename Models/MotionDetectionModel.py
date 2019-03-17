@@ -10,34 +10,36 @@ import numpy as np
 
 # TODO: выбор метода детекции движения
 class MotionDetectionModel:
-    def __init__(self, frames_distance: int = 5):
+    def __init__(self, frames_to_process: int = 10):
         self.frames_deque = deque()
-        self.frames_distance = frames_distance
-        self.frames_to_process = 3
+        self.frames_to_process = frames_to_process
         self.motion_roi = []
 
         self.frames_count = 0
 
     # TODO: возвращать ROI с координатами движения
     def detect_motion(self, image_data: np.ndarray) -> List[Tuple[int, int, int, int]]:
-        if len(self.frames_deque) < self.frames_to_process:
-            self.frames_count += 1
 
-            if self.frames_count % self.frames_distance == 0:
-                self.frames_deque.append(image_data)
-                self.frames_count = 0
-        else:
+        self.frames_deque.appendleft(image_data)
+
+        if len(self.frames_deque) >= self.frames_to_process:
             self.motion_roi = []
 
             f0 = IOps.ConvertToGray(self.frames_deque[0])
-            f1 = IOps.ConvertToGray(self.frames_deque[1])
-            f2 = IOps.ConvertToGray(self.frames_deque[2])
+            f1 = IOps.ConvertToGray(self.frames_deque[len(self.frames_deque) // 2])
+            f2 = IOps.ConvertToGray(self.frames_deque[-1])
 
             movObject = IOps.CreateMovingObject(f0, f1, f2)
 
+            # cv2.imshow("f0", cv2.resize(f0, None, fx=0.2, fy=0.2))
+            # cv2.imshow("f1", cv2.resize(f1, None, fx=0.2, fy=0.2))
+            # cv2.imshow("f2", cv2.resize(f2, None, fx=0.2, fy=0.2))
+            #
+            # cv2.imshow("mov_object", movObject)
+
             # Контуры
-            contours = cv2.findContours(np.copy(movObject),
-                                                   cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contours = cv2.findContours(np.copy(movObject), cv2.RETR_EXTERNAL,
+                                        cv2.CHAIN_APPROX_SIMPLE)
 
             if cv2.__version__[0] != '4':
                 contours = contours[1]
@@ -56,7 +58,7 @@ class MotionDetectionModel:
                 # self.DrawRectangle(cnt, self.frame_to_draw)
                 self.motion_roi.append(cv2.boundingRect(cnt))
 
-            self.frames_deque.popleft()
+            self.frames_deque.pop()
 
         return self.motion_roi
 

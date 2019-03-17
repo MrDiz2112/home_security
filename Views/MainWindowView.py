@@ -1,3 +1,5 @@
+import logging
+
 import Views.Widgets
 
 from PyQt5 import QtWidgets, QtCore
@@ -10,26 +12,30 @@ class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
         super().__init__()
         self.setupUi(self)
 
-        # Вспомгательные поля
-        self.timer = QtCore.QBasicTimer()
-
         # Поля виджетов
         self.cameraWidget = Views.Widgets.CameraWidget()
         self.cameraImageLayout.addWidget(self.cameraWidget)
 
         # Поля патерна MVP
-        self.presenter = MainWindowPresenter(self)
+        self.__presenter = MainWindowPresenter(self)
 
         # Назначение функций
         self.startButton.clicked.connect(self.start_video)
 
     def start_video(self):
-        self.timer.start(0, self)
+        self.__presenter.start_camera()
+        self.__ui_info("Start camera")
 
-    def timerEvent(self, event):
-        if event.timerId() != self.timer.timerId():
-            return
+        # self.update()
 
-        self.presenter.get_camera_image()
+    def __ui_info(self, msg:str):
+        message = f"[UI] {msg}"
+        logging.info(message)
 
-        self.update()
+    def __ui_warn(self, msg:str):
+        message = f"[UI] {msg}"
+        logging.warning(message)
+
+    def __ui_error(self, msg:str):
+        message = f"[UI] {msg}"
+        logging.error(message)
