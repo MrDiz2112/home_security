@@ -17,7 +17,7 @@ def main():
     main_window = MainWindowView()
     main_window.show()
 
-    logging.info("Application started!")
+    logging.info("[Main] Application started!")
 
     sys.exit(app.exec_())
 
@@ -27,7 +27,7 @@ def init_logger(now_date):
         os.makedirs("./log")
 
     # log_formatter = logging.Formatter('[%(asctime)s][%(threadName)s][%(levelname)s] %(message)s')
-    log_formatter = logging.Formatter('[%(asctime)s][%(levelname)s] %(message)s')
+    log_formatter = logging.Formatter('%(asctime)s [%(levelname)s]%(message)s')
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
 
