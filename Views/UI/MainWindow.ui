@@ -201,6 +201,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="settingsButton">
+        <property name="text">
+         <string>Настройка обработки</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="notificationButton">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">

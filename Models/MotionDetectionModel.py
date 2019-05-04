@@ -1,10 +1,9 @@
-import sys
 from typing import List, Tuple
 from collections import deque
 
 import cv2
 
-from Models.ImageOperations import ImageOperations as IOps
+from Core.Utils.ImageOperations import ImageOperations as IOps
 
 import numpy as np
 

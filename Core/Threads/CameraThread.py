@@ -21,10 +21,11 @@ class CameraThread(QThread):
 
     def run(self):
         if self.__manager is None:
+            self.__cam_thread_warn("Manager is null!")
             return
 
         self.__is_running = True
-        self.__cam_thread_info(f"Camera {self.__cam_port} started")
+        self.__cam_thread_info(f"Camera {self.__cam_port} is running")
 
         if not self.__open():
             raise Exception(f"Failed to open camera {self.__cam_port}")
@@ -37,7 +38,7 @@ class CameraThread(QThread):
             res, frame = self.__cam.read()
 
             if res:
-                self.__manager.put_frame(frame)
+                self.__manager.put_camera_frame(frame)
 
                 end_time = time.time()
 

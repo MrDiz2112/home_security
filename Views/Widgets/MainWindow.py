@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'Views/UI/MainWindow.ui'
+# Form implementation generated from reading ui file '/Users/mrdiz/Projects/Python/home_security/Views/UI/MainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -83,6 +84,9 @@ class Ui_MainWindow(object):
         self.databaseButton.setMaximumSize(QtCore.QSize(250, 16777215))
         self.databaseButton.setObjectName("databaseButton")
         self.settingsLayout.addWidget(self.databaseButton)
+        self.settingsButton = QtWidgets.QPushButton(self.centralwidget)
+        self.settingsButton.setObjectName("settingsButton")
+        self.settingsLayout.addWidget(self.settingsButton)
         self.notificationButton = QtWidgets.QPushButton(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -130,7 +134,9 @@ class Ui_MainWindow(object):
         self.startButton.setText(_translate("MainWindow", "Старт"))
         self.stopButton.setText(_translate("MainWindow", "Стоп"))
         self.databaseButton.setText(_translate("MainWindow", "База лиц"))
+        self.settingsButton.setText(_translate("MainWindow", "Настройка обработки"))
         self.notificationButton.setText(_translate("MainWindow", "Настройка оповещений"))
         self.displayProcessingCheckBox.setText(_translate("MainWindow", "Показать результат обработки"))
         self.notificationCheckBox.setText(_translate("MainWindow", "Включить оповещения"))
+
 
