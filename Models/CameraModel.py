@@ -6,15 +6,15 @@ import numpy as np
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtCore import QThread, pyqtSignal, pyqtSlot
 
-from Core import Manager
-from Core.Threads import CameraThread
+from Core import CameraManager
+from Core.Threads import CameraThread, MotionDetectionThread
 from Models import FaceDetectionModel, MotionDetectionModel
 
 
 class CameraModel(QtCore.QObject):
-    on_thread_finished = pyqtSignal()
+    on_camera_thread_finished = pyqtSignal()
 
-    def __init__(self, cascade_filepath: str, camera_port: int, fps: float, manager: Manager):
+    def __init__(self, cascade_filepath: str, camera_port: int, fps: float, manager: CameraManager):
         super().__init__()
 
         self.__manager = manager
@@ -22,11 +22,10 @@ class CameraModel(QtCore.QObject):
         self.__fps = fps
 
         self.__camera_thread = CameraThread(self.__camera_port, self.__fps, self.__manager)
-        self.__camera_thread.finished.connect(self.__grab_finished)
+        self.__motion_detection_thread = MotionDetectionThread(self.__manager, 5)
 
-        self._colorFace = (0, 255, 182)
-        self._colorMotion = (0, 0, 255)
-        self._thickness = 2
+        self.__camera_thread.finished.connect(self.__grab_finished)
+        self.__motion_detection_thread.finished.connect(self.__motion_detection_finished)
 
         self._face_detection_model = FaceDetectionModel(cascade_filepath)
         self._motion_detection_model = MotionDetectionModel()
@@ -34,16 +33,22 @@ class CameraModel(QtCore.QObject):
     # Методы для View
 
     # TODO: обработка флага отображения обработки
-    def start_frame_grabber(self, is_display_processing: bool) -> None:
+    def start_processing(self, is_display_processing: bool) -> None:
         self.__camera_thread.start(QThread.HighestPriority)
+        self.__motion_detection_thread.start(QThread.HighPriority)
 
-    def stop_frame_grabber(self):
+    def stop_processing(self):
+        self.__motion_detection_thread.stop()
         self.__camera_thread.stop()
 
     @pyqtSlot()
     def __grab_finished(self):
         self.__camera_model_info("Frame grabber finished")
-        self.on_thread_finished.emit()
+        self.on_camera_thread_finished.emit()
+
+    @pyqtSlot()
+    def __motion_detection_finished(self):
+        self.__camera_model_info("Motion Detection finished")
 
     # Методы бизнес логики
 
@@ -87,6 +92,17 @@ class CameraModel(QtCore.QObject):
                           (x + w, y + h),
                           self._colorFace,
                           self._thickness)
+
+    # TODO: нет ссылок
+    def __draw_rectangle(self, cnt, img):
+        x, y, w, h = cv2.boundingRect(cnt)
+
+        M = cv2.moments(cnt)
+        cx = int(M['m10'] / M['m00'])
+        cy = int(M['m01'] / M['m00'])
+
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        cv2.circle(img, (cx, cy), 3, (255, 255, 0), 3)
 
     def __camera_model_info(self, msg:str):
         message = f"[CameraModel {self.__camera_port}] {msg}"

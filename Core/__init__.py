@@ -1,1 +1,1 @@
-from Core.Manager import Manager
+from Core.CameraManager import CameraManager

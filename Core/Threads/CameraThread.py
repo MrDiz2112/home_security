@@ -6,15 +6,15 @@ import numpy as np
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QImage
 
-from Core import Manager
+from Core import CameraManager
 
 
 class CameraThread(QThread):
-    def __init__(self, cam_port: int, fps: float, manager: Manager):
+    def __init__(self, cam_port: int, fps: float, manager: CameraManager):
         super().__init__()
 
         self.__cam = None
-        self.__manager: Manager = manager
+        self.__manager: CameraManager = manager
         self.__is_running: bool = False
         self.__cam_port: int = cam_port
         self.__frame_wait = 1/ fps

@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtGui import QImage, QPixmap
 
 from Configuration import FaceDetectionConfig
-from Core import Manager
+from Core import CameraManager
 from Core.Threads import CameraUiThread
 from Models import CameraModel
 
@@ -17,7 +17,7 @@ class MainWindowPresenter:
         self.view = view
 
         # TODO: выбор порта
-        self.__manager: Manager = Manager()
+        self.__manager: CameraManager = CameraManager()
 
         fps = 25.0
 
@@ -27,13 +27,13 @@ class MainWindowPresenter:
                                          fps,
                                          self.__manager)
 
-        self.__cameraModel.on_thread_finished.connect(self.__reset_camera)
+        self.__cameraModel.on_camera_thread_finished.connect(self.__reset_camera)
 
     def start_camera(self):
         self.__presenter_info("Start camera init")
 
         is_display_processing = self.view.displayProcessingCheckBox.isChecked()
-        self.__cameraModel.start_frame_grabber(is_display_processing)
+        self.__cameraModel.start_processing(is_display_processing)
 
         self.__presenter_info("Start Camera UI Thread")
 
@@ -45,7 +45,7 @@ class MainWindowPresenter:
         self.view.stopButton.setEnabled(True)
 
     def stop_camera(self):
-        self.__cameraModel.stop_frame_grabber()
+        self.__cameraModel.stop_processing()
 
     def switch_mode(self):
         pass
