@@ -2,10 +2,12 @@ from typing import List, Tuple
 
 import cv2
 import numpy as np
+from PyQt5.QtCore import QObject
 
 
-class FaceDetectionModel:
+class FaceDetectionModel(QObject):
     def __init__(self, cascade_filepath: str):
+        super().__init__()
         self.classifier = cv2.CascadeClassifier(cascade_filepath)
         self._min_size = (15, 15)
 

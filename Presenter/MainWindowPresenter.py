@@ -1,6 +1,6 @@
 import logging
 
-from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtCore import pyqtSlot, Qt, QObject
 from PyQt5.QtGui import QImage, QPixmap
 
 from Configuration import FaceDetectionConfig
@@ -11,9 +11,9 @@ from Models import CameraModel
 from Views import MainWindowView
 
 
-class MainWindowPresenter:
-    def __init__(self, view : MainWindowView):
-
+class MainWindowPresenter(QObject):
+    def __init__(self, view: MainWindowView):
+        super().__init__()
         self.view = view
 
         # TODO: выбор порта

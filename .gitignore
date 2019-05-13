@@ -2,3 +2,5 @@
 /log/*
 /materials/*
 *.log
+.vs/
+*.pyproj

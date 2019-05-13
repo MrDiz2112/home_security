@@ -2,14 +2,16 @@ from typing import List, Tuple
 from collections import deque
 
 import cv2
+from PyQt5.QtCore import QObject
 
 from Core.Utils.ImageOperations import ImageOperations as IOps
 
 import numpy as np
 
 # TODO: выбор метода детекции движения
-class MotionDetectionModel:
+class MotionDetectionModel(QObject):
     def __init__(self, frames_to_process: int = 10):
+        super().__init__()
         self.frames_deque = deque()
         self.frames_to_process = frames_to_process
         self.motion_roi = []
