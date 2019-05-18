@@ -36,7 +36,8 @@ class CameraManager:
             for motion_roi in roi:
                 try:
                     x,y,w,h = motion_roi
-                    cv2.rectangle(img, (x,y), (x+w, y+h), self._color_motion, self._thickness)
+                    if  x >= 0 and y >= 0 and w >= 0 and h >= 0:
+                        cv2.rectangle(img, (x,y), (x+w, y+h), self._color_motion, self._thickness)
                 except Exception as ex:
                     self.__manager_error(f"Failed to draw rect. {ex}")
 

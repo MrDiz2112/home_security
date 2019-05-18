@@ -18,8 +18,7 @@ class MotionDetectionModel(QObject):
 
         self.frames_count = 0
 
-    # TODO: возвращать ROI с координатами движения
-    def detect_motion(self, image_data: np.ndarray) -> List[Tuple[int, int, int, int]]:
+    def detect_motion(self, image_data: np.ndarray, connect_all_contours = True) -> List[Tuple[int, int, int, int]]:
 
         self.frames_deque.appendleft(image_data)
 
@@ -43,8 +42,10 @@ class MotionDetectionModel(QObject):
                                         cv2.CHAIN_APPROX_SIMPLE)
 
             if cv2.__version__[0] != '4':
+                hierarchy = contours[2]
                 contours = contours[1]
             else:
+                hierarchy = contours[1]
                 contours = contours[0]
 
             contours_big = []
@@ -53,11 +54,14 @@ class MotionDetectionModel(QObject):
                 if (cv2.contourArea(cnt) > 70):
                     contours_big.append(cnt)
 
-            contours_complete = IOps.ConnectNearbyContours(contours_big, 70)
+            if connect_all_contours:
+                self.motion_roi.append(IOps.connect_all_contours(contours_big, hierarchy))
+            else:
+                contours_complete = IOps.ConnectNearbyContours(contours_big, 70)
 
-            for cnt in contours_complete:
-                # self.DrawRectangle(cnt, self.frame_to_draw)
-                self.motion_roi.append(cv2.boundingRect(cnt))
+                for cnt in contours_complete:
+                    # self.DrawRectangle(cnt, self.frame_to_draw)
+                    self.motion_roi.append(cv2.boundingRect(cnt))
 
             self.frames_deque.pop()
 

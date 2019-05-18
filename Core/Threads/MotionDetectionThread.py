@@ -14,7 +14,7 @@ from Core.Utils import ImageOperations as IOps
 
 
 class MotionDetectionThread(QThread):
-    def __init__(self, manager: CameraManager, frames_to_process: int):
+    def __init__(self, manager: CameraManager, frames_to_process: int, connect_all_contours = True):
         super().__init__()
 
         self.__manager: CameraManager = manager
@@ -22,6 +22,7 @@ class MotionDetectionThread(QThread):
 
         self.__frames_deque: deque = deque()
         self.__frames_to_process: int = frames_to_process
+        self.__connect_all_contours = connect_all_contours
         self.motion_roi: list = []
 
     def run(self):
@@ -94,29 +95,41 @@ class MotionDetectionThread(QThread):
                                         cv2.CHAIN_APPROX_SIMPLE)
 
             if cv2.__version__[0] != '4':
+                hierarchy = contours[2]
                 contours = contours[1]
             else:
+                hierarchy = contours[1]
                 contours = contours[0]
 
             contours_big = []
 
             for cnt in contours:
-                if cv2.contourArea(cnt) > 70:
+                if (cv2.contourArea(cnt) > 70):
                     contours_big.append(cnt)
 
-            contours_complete = IOps.ConnectNearbyContours(contours_big, 70)
+            if self.__connect_all_contours:
+                roi = IOps.connect_all_contours(contours_big, hierarchy)
 
-            for cnt in contours_complete:
-                # self.DrawRectangle(cnt, self.frame_to_draw)
-                x,y,w,h = cv2.boundingRect(cnt)
-                img_roi = image_data[x:y, x+w:y+h]
+                if roi is not None:
+                    x,y,w,h = roi
+                    img_roi =image_data[x:y, x+w:y+h]
 
-                motion_roi = MotionRoi(img_roi, (x,y,w,h))
+                    motion_roi = MotionRoi(img_roi, roi)
 
-                self.motion_roi.append(motion_roi)
+                    self.motion_roi.append(motion_roi)
 
-            if len(self.__frames_deque) != 0:
-                self.__frames_deque.pop()
+            else:
+                contours_complete = IOps.ConnectNearbyContours(contours_big, 70)
+
+                for cnt in contours_complete:
+                    x,y,w,h = cv2.boundingRect(cnt)
+                    img_roi = image_data[x:y, x + w:y + h]
+
+                    motion_roi = MotionRoi(img_roi, (x,y,w,h))
+
+                    self.motion_roi.append(motion_roi)
+
+            self.__frames_deque.pop()
 
         return self.motion_roi
 

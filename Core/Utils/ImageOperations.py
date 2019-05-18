@@ -105,6 +105,32 @@ class ImageOperations:
         return contours_complete
 
     @classmethod
+    def connect_all_contours(cls, contours, contours_hierarchy):
+        """
+        Return bounding rect of all contours
+        :return: (x, y, w, h)
+        """
+        try:
+            hierarchy = contours_hierarchy[0]
+        except:
+            hierarchy = []
+
+        min_x, min_y = 9999, 9999
+        max_x = max_y = 0
+
+        # computes the bounding box for the contour, and draws it on the frame,
+        for contour, hier in zip(contours, hierarchy):
+            (x, y, w, h) = cv2.boundingRect(contour)
+            min_x, max_x = min(x, min_x), max(x + w, max_x)
+            min_y, max_y = min(y, min_y), max(y + h, max_y)
+
+        if min_x> max_x or min_y > max_y:
+            return None
+
+        return min_x, min_y, max_x - min_x, max_y - min_y
+
+
+    @classmethod
     def ConnectNearbyContours1(self, contours_big, contourDist):
         cnt_size = len(contours_big)
         cnt_dists = np.zeros((cnt_size, cnt_size))
