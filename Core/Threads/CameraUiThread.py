@@ -25,6 +25,7 @@ class CameraUiThread(QThread):
         self.__ui_thread_info("Start Camera UI thread")
 
         while self.__is_running:
+            #TODO: тащить из менеджера roi для прорисовки
             frame = self.__get_frame()
 
             image = self.__get_qimage(frame)

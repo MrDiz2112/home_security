@@ -23,7 +23,7 @@ class MainWindowPresenter(QObject):
 
         self.__camera_ui_thread = CameraUiThread()
         self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path,
-                                         r"materials/thief1.mp4",
+                                         r"materials/thief5.mp4",
                                          fps,
                                          self.__manager)
 

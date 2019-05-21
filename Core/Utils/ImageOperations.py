@@ -1,9 +1,15 @@
+from typing import Tuple
+
 import numpy as np
 import cv2
 
 
 class ImageOperations:
-    KERNEL = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    KERNEL = cv2.getStructuringElement(cv2.MORPH_RECT, (40, 40))
+
+    @classmethod
+    def set_kernel_size(cls, size: Tuple[int, int]):
+        cls.KERNEL = cv2.getStructuringElement(cv2.MORPH_RECT, size)
 
     @classmethod
     def Filter(self, frame):
@@ -20,13 +26,13 @@ class ImageOperations:
 
     @classmethod
     def Morph(self, img):
-        openning = cv2.morphologyEx(img, cv2.MORPH_OPEN, self.KERNEL)
-        closing = cv2.morphologyEx(openning, cv2.MORPH_CLOSE, self.KERNEL)
-        dilate = cv2.dilate(closing, self.KERNEL, iterations=6)
-        erode = cv2.erode(dilate, self.KERNEL, iterations=4)
-        openning = cv2.morphologyEx(erode, cv2.MORPH_OPEN,
-                                    cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)))
-        return openning
+        # openning = cv2.morphologyEx(img, cv2.MORPH_OPEN, self.KERNEL)
+        closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, self.KERNEL)
+        # dilate = cv2.dilate(closing, self.KERNEL, iterations=6)
+        # erode = cv2.erode(dilate, self.KERNEL, iterations=4)
+        # openning = cv2.morphologyEx(erode, cv2.MORPH_OPEN,
+        #                             cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5)))
+        return closing
 
     @classmethod
     def CreateBackground(self, dif1, dif2, frame):

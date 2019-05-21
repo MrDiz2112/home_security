@@ -9,12 +9,12 @@ from collections import deque
 from PyQt5.QtCore import QThread
 
 from Core import CameraManager
-from Core.Data import MotionRoi
+from Core.Data import RoiData
 from Core.Utils import ImageOperations as IOps
 
 
 class MotionDetectionThread(QThread):
-    def __init__(self, manager: CameraManager, frames_to_process: int, connect_all_contours = True):
+    def __init__(self, manager: CameraManager, frames_to_process: int, connect_all_contours = False):
         super().__init__()
 
         self.__manager: CameraManager = manager
@@ -23,7 +23,7 @@ class MotionDetectionThread(QThread):
         self.__frames_deque: deque = deque()
         self.__frames_to_process: int = frames_to_process
         self.__connect_all_contours = connect_all_contours
-        self.motion_roi: list = []
+        self.__motion_roi: list = []
 
     def run(self):
         if self.__manager is None:
@@ -37,6 +37,7 @@ class MotionDetectionThread(QThread):
             return
 
         self.__motion_thread_info("Start motion detection")
+        IOps.set_kernel_size((40, 40)) #TODO: вынести в настройки
 
         while self.__is_running:
             motions = self.__detect_motion()
@@ -64,7 +65,7 @@ class MotionDetectionThread(QThread):
             self.__motion_thread_error(f"Error during preparation to motion detection {ex}")
             return False
 
-    def __detect_motion(self) -> List[MotionRoi]:
+    def __detect_motion(self) -> List[RoiData]:
         """
         Возвращает ROI, где было обнаружено движение
         :return:
@@ -76,7 +77,7 @@ class MotionDetectionThread(QThread):
         self.__frames_deque.appendleft(image_data)
 
         if len(self.__frames_deque) >= self.__frames_to_process:
-            self.motion_roi = []
+            self.__motion_roi = []
 
             f0 = IOps.ConvertToGray(self.__frames_deque[0])
             f1 = IOps.ConvertToGray(self.__frames_deque[len(self.__frames_deque) // 2])
@@ -112,26 +113,26 @@ class MotionDetectionThread(QThread):
 
                 if roi is not None:
                     x,y,w,h = roi
-                    img_roi =image_data[x:y, x+w:y+h]
+                    img_roi = image_data[y:x, y + h:x + w]
 
-                    motion_roi = MotionRoi(img_roi, roi)
+                    motion_roi = RoiData(img_roi, roi)
 
-                    self.motion_roi.append(motion_roi)
+                    self.__motion_roi.append(motion_roi)
 
             else:
                 contours_complete = IOps.ConnectNearbyContours(contours_big, 70)
 
                 for cnt in contours_complete:
                     x,y,w,h = cv2.boundingRect(cnt)
-                    img_roi = image_data[x:y, x + w:y + h]
+                    img_roi = image_data[y:x, y + h:x + w]
 
-                    motion_roi = MotionRoi(img_roi, (x,y,w,h))
+                    motion_roi = RoiData(img_roi, (x, y, w, h))
 
-                    self.motion_roi.append(motion_roi)
+                    self.__motion_roi.append(motion_roi)
 
             self.__frames_deque.pop()
 
-        return self.motion_roi
+        return self.__motion_roi
 
     def __motion_thread_info(self, msg:str):
         message = f"[MotionDetectionThread] {msg}"

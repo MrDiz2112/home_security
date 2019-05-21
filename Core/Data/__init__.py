@@ -1,1 +1,1 @@
-from Core.Data.MotionRoi import MotionRoi
+from Core.Data.RoiData import RoiData
