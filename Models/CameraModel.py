@@ -34,7 +34,7 @@ class CameraModel(QtCore.QObject):
 
     # TODO: обработка флага отображения обработки
     def start_processing(self, is_display_processing: bool) -> None:
-        self.__face_detection_thread.start(QThread.HighPriority)
+        self.__face_detection_thread.start(QThread.HighestPriority)
 
     def stop_processing(self):
         self.__face_detection_thread.stop()
@@ -43,8 +43,8 @@ class CameraModel(QtCore.QObject):
 
     @pyqtSlot()
     def __launch_camera(self):
-        self.__camera_thread.start(QThread.HighestPriority)
-        self.__motion_detection_thread.start(QThread.HighPriority)
+        self.__camera_thread.start(QThread.IdlePriority)
+        self.__motion_detection_thread.start(QThread.HighestPriority)
 
     @pyqtSlot()
     def __grab_finished(self):

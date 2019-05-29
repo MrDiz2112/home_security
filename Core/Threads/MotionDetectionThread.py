@@ -20,6 +20,8 @@ class MotionDetectionThread(QThread):
         self.__manager: CameraManager = manager
         self.__is_running: bool = False
 
+        self.__scale_factor = 8
+
         self.__frames_deque: deque = deque()
         self.__frames_to_process: int = frames_to_process
         self.__connect_all_contours = connect_all_contours
@@ -42,8 +44,7 @@ class MotionDetectionThread(QThread):
         while self.__is_running:
             motions = self.__detect_motion()
 
-            for roi in motions:
-                self.__manager.put_motion_roi(roi)
+            self.__manager.put_motion_roi(motions)
 
         self.__motion_thread_info("Motion detection stopped")
 
@@ -56,7 +57,12 @@ class MotionDetectionThread(QThread):
         try:
             while not len(self.__frames_deque) == self.__frames_to_process:
                 img = self.__manager.get_camera_image()
-                self.__frames_deque.appendleft(img)
+                factor = self.__scale_factor
+
+                height, width = img.shape[:2]
+
+                img_small = cv2.resize(img, (width // factor, height // factor))
+                self.__frames_deque.appendleft(img_small)
 
             self.__motion_thread_info("Preparation to motion detection completed")
             return True
@@ -74,61 +80,70 @@ class MotionDetectionThread(QThread):
         # TODO: если выключена обработка - возвращать весь кадр
         image_data = self.__manager.get_camera_image()
 
-        self.__frames_deque.appendleft(image_data)
+        factor = self.__scale_factor
+
+        height, width = image_data.shape[:2]
+
+        img_small = cv2.resize(image_data, (width // factor, height // factor))
+
+        self.__frames_deque.appendleft(img_small)
 
         if len(self.__frames_deque) >= self.__frames_to_process:
             self.__motion_roi = []
 
-            f0 = IOps.ConvertToGray(self.__frames_deque[0])
-            f1 = IOps.ConvertToGray(self.__frames_deque[len(self.__frames_deque) // 2])
-            f2 = IOps.ConvertToGray(self.__frames_deque[-1])
+            try:
+                f0 = IOps.ConvertToGray(self.__frames_deque[0])
+                f1 = IOps.ConvertToGray(self.__frames_deque[len(self.__frames_deque) // 2])
+                f2 = IOps.ConvertToGray(self.__frames_deque[-1])
 
-            movObject = IOps.CreateMovingObject(f0, f1, f2)
+                movObject = IOps.CreateMovingObject(f0, f1, f2)
 
-            # cv2.imshow("f0", cv2.resize(f0, None, fx=0.2, fy=0.2))
-            # cv2.imshow("f1", cv2.resize(f1, None, fx=0.2, fy=0.2))
-            # cv2.imshow("f2", cv2.resize(f2, None, fx=0.2, fy=0.2))
-            #
-            # cv2.imshow("mov_object", movObject)
+                # cv2.imshow("f0", cv2.resize(f0, None, fx=0.2, fy=0.2))
+                # cv2.imshow("f1", cv2.resize(f1, None, fx=0.2, fy=0.2))
+                # cv2.imshow("f2", cv2.resize(f2, None, fx=0.2, fy=0.2))
+                #
+                # cv2.imshow("mov_object", movObject)
 
-            # Контуры
-            contours = cv2.findContours(np.copy(movObject), cv2.RETR_EXTERNAL,
-                                        cv2.CHAIN_APPROX_SIMPLE)
+                # Контуры
+                contours = cv2.findContours(np.copy(movObject), cv2.RETR_EXTERNAL,
+                                            cv2.CHAIN_APPROX_SIMPLE)
 
-            if cv2.__version__[0] != '4':
-                hierarchy = contours[2]
-                contours = contours[1]
-            else:
-                hierarchy = contours[1]
-                contours = contours[0]
+                if cv2.__version__[0] != '4':
+                    hierarchy = contours[2]
+                    contours = contours[1]
+                else:
+                    hierarchy = contours[1]
+                    contours = contours[0]
 
-            contours_big = []
+                contours_big = []
 
-            for cnt in contours:
-                if (cv2.contourArea(cnt) > 70):
-                    contours_big.append(cnt)
+                for cnt in contours:
+                    if (cv2.contourArea(cnt) > 0):
+                        contours_big.append(cnt)
 
-            if self.__connect_all_contours:
-                roi = IOps.connect_all_contours(contours_big, hierarchy)
+                if self.__connect_all_contours:
+                    roi = IOps.connect_all_contours(contours_big, hierarchy)
 
-                if roi is not None:
-                    x,y,w,h = roi
-                    img_roi = image_data[y:x, y + h:x + w]
+                    if roi is not None:
+                        x,y,w,h = tuple((x * factor for x in roi))
+                        img_roi = image_data[y:x, y + h:x + w]
 
-                    motion_roi = RoiData(img_roi, roi)
+                        motion_roi = RoiData(img_roi, roi)
 
-                    self.__motion_roi.append(motion_roi)
+                        self.__motion_roi.append(motion_roi)
 
-            else:
-                contours_complete = IOps.ConnectNearbyContours(contours_big, 70)
+                else:
+                    contours_complete = IOps.ConnectNearbyContours(contours_big, 0)
 
-                for cnt in contours_complete:
-                    x,y,w,h = cv2.boundingRect(cnt)
-                    img_roi = image_data[y:x, y + h:x + w]
+                    for cnt in contours_big:
+                        x,y,w,h = tuple(x * factor for x in cv2.boundingRect(cnt))
+                        img_roi = image_data[y:x, y + h:x + w]
 
-                    motion_roi = RoiData(img_roi, (x, y, w, h))
+                        motion_roi = RoiData(img_roi, (x, y, w, h))
 
-                    self.__motion_roi.append(motion_roi)
+                        self.__motion_roi.append(motion_roi)
+            except Exception as ex:
+                self.__motion_thread_error(f"{ex}")
 
             self.__frames_deque.pop()
 

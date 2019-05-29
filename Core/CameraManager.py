@@ -7,11 +7,17 @@ import numpy as np
 
 from queue import Queue
 
+from PyQt5.QtCore import QObject, pyqtSignal
+
 from Core.Data import RoiData
 
 
-class CameraManager:
+class CameraManager(QObject):
+    on_motion_roi_changed = pyqtSignal()
+    on_faces_roi_changed = pyqtSignal()
+
     def __init__(self):
+        super().__init__()
         self.__camera_frames: Queue = Queue()
         self.__motions_roi: Queue = Queue()
         self.__faces_roi: Queue = Queue()
@@ -19,31 +25,24 @@ class CameraManager:
         self.__motions_roi_to_draw: List[Tuple[int, int, int, int]] = []
         self.__faces_roi_to_draw: List[Tuple[int, int, int, int]] = []
 
-        self.__color_motion = (0, 0, 255)
-        self.__color_face = (0, 255, 182)
-        self.__thickness = 2
-
     # TODO: добавить поддержку аннотаций
     # TODO: своровать у Данила Visualisation.py
     def get_camera_image(self) -> np.ndarray:
         img = self.__camera_frames.get()
 
-        self.__draw_rect(img, self.__motions_roi_to_draw, self.__color_motion)
-        self.__draw_rect(img, self.__faces_roi_to_draw, self.__color_face)
-
         return img
 
-    def __draw_rect(self, img: np.ndarray, roi: List[Tuple[int, int, int, int]], color: Tuple[int, int, int]):
-        if len(roi) != 0:
-            for motion_roi in roi:
-                try:
-                    x,y,w,h = motion_roi
-                    if  x >= 0 and y >= 0 and w >= 0 and h >= 0:
-                        cv2.rectangle(img, (x,y), (x+w, y+h), color, self.__thickness)
-                except Exception as ex:
-                    self.__manager_error(f"Failed to draw rect. {ex}")
+    def get_motions_roi_to_draw(self):
+        return self.__motions_roi_to_draw
 
-            roi.clear()
+    def get_faces_roi_to_draw(self):
+        return self.__faces_roi_to_draw
+
+    def clear_motions_roi_to_draw(self):
+        self.__motions_roi_to_draw.clear()
+
+    def clear_faces_roi_to_draw(self):
+        self.__faces_roi_to_draw.clear()
 
     def get_motion_roi(self) -> RoiData:
         img = self.__motions_roi.get()
@@ -58,15 +57,18 @@ class CameraManager:
     def put_camera_frame(self, img:np.ndarray):
         self.__camera_frames.put(img)
 
-    def put_motion_roi(self, motion_roi: RoiData):
-        self.__motions_roi.put(motion_roi)
+    def put_motion_roi(self, motion_roi: List[RoiData]):
+        for roi in motion_roi:
+            self.__motions_roi.put(roi)
+            self.__motions_roi_to_draw.append(roi.roi)
 
-        self.__motions_roi_to_draw.append(motion_roi.roi)
+        self.on_motion_roi_changed.emit()
 
     def put_face_roi(self, face_roi: RoiData):
         self.__faces_roi.put(face_roi)
 
         self.__faces_roi_to_draw.append(face_roi.roi)
+        self.on_faces_roi_changed.emit()
 
     def clear_manager(self):
         while not self.__camera_frames.empty():

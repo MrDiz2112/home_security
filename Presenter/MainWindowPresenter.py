@@ -1,6 +1,6 @@
 import logging
 
-from PyQt5.QtCore import pyqtSlot, Qt, QObject
+from PyQt5.QtCore import pyqtSlot, Qt, QObject, QThread
 from PyQt5.QtGui import QImage, QPixmap
 
 from Configuration import FaceDetectionConfig
@@ -21,7 +21,7 @@ class MainWindowPresenter(QObject):
 
         fps = 25.0
 
-        self.__camera_ui_thread = CameraUiThread()
+        self.__camera_ui_thread = CameraUiThread(self.__manager)
         self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path,
                                          r"materials/thief5.mp4",
                                          fps,
@@ -37,9 +37,8 @@ class MainWindowPresenter(QObject):
 
         self.__presenter_info("Start Camera UI Thread")
 
-        self.__camera_ui_thread.assign_caller(self.__manager.get_camera_image)
         self.__camera_ui_thread.on_new_image.connect(self.__update_camera_widget_image)
-        self.__camera_ui_thread.start()
+        self.__camera_ui_thread.start(QThread.HighestPriority)
 
         self.view.startButton.setEnabled(False)
         self.view.stopButton.setEnabled(True)

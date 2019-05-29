@@ -46,10 +46,11 @@ class FaceDetectionThread(QThread):
         self.on_prepare_finished.emit()
 
         while self.__is_running:
-            faces = self.__detect_face()
-
-            for face in faces:
-                self.__manager.put_face_roi(face)
+            # faces = self.__detect_face()
+            #
+            # for face in faces:
+            #     self.__manager.put_face_roi(face)
+            pass
 
         self.__face_thread_info("Motion detection stopped")
 
