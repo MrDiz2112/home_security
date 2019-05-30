@@ -25,8 +25,6 @@ class CameraManager(QObject):
         self.__motions_roi_to_draw: List[Tuple[int, int, int, int]] = []
         self.__faces_roi_to_draw: List[Tuple[int, int, int, int]] = []
 
-    # TODO: добавить поддержку аннотаций
-    # TODO: своровать у Данила Visualisation.py
     def get_camera_image(self) -> np.ndarray:
         img = self.__camera_frames.get()
 

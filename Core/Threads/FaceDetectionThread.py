@@ -31,6 +31,8 @@ class FaceDetectionThread(QThread):
 
         self.__faces_roi: List[RoiData] = []
 
+        self.__frames_count = 0
+
     def run(self):
         if self.__manager is None:
             self.__face_thread_warn("Manager is null!")
@@ -46,10 +48,11 @@ class FaceDetectionThread(QThread):
         self.on_prepare_finished.emit()
 
         while self.__is_running:
-            # faces = self.__detect_face()
-            #
-            # for face in faces:
-            #     self.__manager.put_face_roi(face)
+            faces = self.__detect_face()
+            self.__frames_count += 1
+
+            for face in faces:
+                self.__manager.put_face_roi(face)
             pass
 
         self.__face_thread_info("Motion detection stopped")
@@ -83,23 +86,44 @@ class FaceDetectionThread(QThread):
         :return:
         """
         self.__faces_roi = []
+        try:
+            # TODO: если выключена обработка - возвращать весь кадр
+            motion_roi: RoiData = self.__manager.get_motion_roi()
 
-        # TODO: если выключена обработка - возвращать весь кадр
-        motion_roi: RoiData = self.__manager.get_motion_roi()
+            x = motion_roi.roi[0]
+            y = motion_roi.roi[1]
 
-        img: np.ndarray = motion_roi.img
+            img: np.ndarray = motion_roi.img
 
-        dets = self.__detector(img, 0)
+            filename = os.path.join(os.getcwd(), "roi", str(self.__frames_count) + ".jpg")
+            cv2.imwrite(filename, img)
 
-        for k, d in enumerate(dets):
-            shape : dlib.full_object_detection = self.__shape_predictor(img, d)
-            roi: dlib.rectangle = shape.rect
+            b,g,r = cv2.split(img)
+            img_rgb = cv2.merge((r,g,b))
 
-            img_roi = img[roi.top():roi.left(), roi.bottom():roi.right()]
-            face_roi = RoiData(img_roi, (roi.top(), roi. left(),
-                                         roi.bottom() - roi.top(), roi.right() - roi.left()))
+            dets = self.__detector(img_rgb, 1)
 
-            self.__faces_roi.append(face_roi)
+            #TODO: расчитать смещение roi
+
+            for k, d in enumerate(dets):
+                shape : dlib.full_object_detection = self.__shape_predictor(img_rgb, d)
+                roi: dlib.rectangle = shape.rect
+
+                x_offset = x
+                y_offset = y
+
+                img_roi = img[roi.top():roi.bottom(), roi.left():roi.right()]
+                face_roi = RoiData(img_roi, (y_offset + roi.top(),
+                                             y_offset + roi.bottom() - roi.top(),
+                                             x_offset + roi.left(),
+                                             x_offset + roi.right() - roi.left()))
+
+                filename = os.path.join(os.getcwd(), "roi", "f_" + str(self.__frames_count) + ".jpg")
+                cv2.imwrite(filename, img)
+
+                self.__faces_roi.append(face_roi)
+        except Exception as ex:
+            self.__face_thread_error(f"{ex}")
 
         return self.__faces_roi
 

@@ -137,7 +137,7 @@ class MotionDetectionThread(QThread):
 
                     for cnt in contours_big:
                         x,y,w,h = tuple(x * factor for x in cv2.boundingRect(cnt))
-                        img_roi = image_data[y:x, y + h:x + w]
+                        img_roi = image_data[y:y + h, x:x + w]
 
                         motion_roi = RoiData(img_roi, (x, y, w, h))
 
