@@ -51,8 +51,7 @@ class FaceDetectionThread(QThread):
             faces = self.__detect_face()
             self.__frames_count += 1
 
-            for face in faces:
-                self.__manager.put_face_roi(face)
+            self.__manager.put_face_roi(faces)
             pass
 
         self.__face_thread_info("Motion detection stopped")
@@ -95,8 +94,8 @@ class FaceDetectionThread(QThread):
 
             img: np.ndarray = motion_roi.img
 
-            filename = os.path.join(os.getcwd(), "roi", str(self.__frames_count) + ".jpg")
-            cv2.imwrite(filename, img)
+            # filename = os.path.join(os.getcwd(), "roi", str(self.__frames_count) + ".jpg")
+            # cv2.imwrite(filename, img)
 
             b,g,r = cv2.split(img)
             img_rgb = cv2.merge((r,g,b))
@@ -113,13 +112,13 @@ class FaceDetectionThread(QThread):
                 y_offset = y
 
                 img_roi = img[roi.top():roi.bottom(), roi.left():roi.right()]
-                face_roi = RoiData(img_roi, (y_offset + roi.top(),
-                                             y_offset + roi.bottom() - roi.top(),
-                                             x_offset + roi.left(),
-                                             x_offset + roi.right() - roi.left()))
+                face_roi = RoiData(img_roi, (x_offset + roi.left(),
+                                             y_offset + roi.top(),
+                                             roi.right() - roi.left(),
+                                             roi.bottom() - roi.top()))
 
-                filename = os.path.join(os.getcwd(), "roi", "f_" + str(self.__frames_count) + ".jpg")
-                cv2.imwrite(filename, img)
+                # filename = os.path.join(os.getcwd(), "roi", "f_" + str(self.__frames_count) + ".jpg")
+                # cv2.imwrite(filename, img_roi)
 
                 self.__faces_roi.append(face_roi)
         except Exception as ex:

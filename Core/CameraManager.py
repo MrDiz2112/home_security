@@ -62,10 +62,11 @@ class CameraManager(QObject):
 
         self.on_motion_roi_changed.emit()
 
-    def put_face_roi(self, face_roi: RoiData):
-        self.__faces_roi.put(face_roi)
+    def put_face_roi(self, face_roi: List[RoiData]):
+        for roi in face_roi:
+            self.__faces_roi.put(roi)
+            self.__faces_roi_to_draw.append(roi.roi)
 
-        self.__faces_roi_to_draw.append(face_roi.roi)
         self.on_faces_roi_changed.emit()
 
     def clear_manager(self):
