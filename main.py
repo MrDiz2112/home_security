@@ -3,6 +3,9 @@ import sys
 import logging
 
 from datetime import datetime
+
+import cv2
+import numpy as np
 from PyQt5 import QtWidgets
 from Views import MainWindowView
 
@@ -43,3 +46,4 @@ def init_logger(now_date):
 
 if __name__ == '__main__':
     main()
+    cv2.destroyAllWindows()

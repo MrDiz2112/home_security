@@ -26,12 +26,11 @@ class FaceDetectionThread(QThread):
         self.__is_running: bool = False
 
         self.__shape_predictor = None
-        self.__face_rec_model = None
         self.__detector = dlib.get_frontal_face_detector()
 
         self.__faces_roi: List[RoiData] = []
 
-        self.__frames_count = 0
+        self.__scale_factor = 2
 
     def run(self):
         if self.__manager is None:
@@ -49,7 +48,6 @@ class FaceDetectionThread(QThread):
 
         while self.__is_running:
             faces = self.__detect_face()
-            self.__frames_count += 1
 
             self.__manager.put_face_roi(faces)
             pass
@@ -63,14 +61,12 @@ class FaceDetectionThread(QThread):
     def __prepare_face_detection(self) -> bool:
         try:
             sp_path = os.path.join(os.getcwd(), "Resources", "face_shape_predictor.dat")
-            fr_path = os.path.join(os.getcwd(), "Resources", "face_recognition_resnet.dat")
 
-            if not os.path.exists(sp_path) and not os.path.exists(fr_path):
-                self.__face_thread_info("Missing resource .dat files")
+            if not os.path.exists(sp_path):
+                self.__face_thread_warn("Missing resource .dat files")
                 return False
 
             self.__shape_predictor = dlib.shape_predictor(sp_path)
-            self.__face_rec_model = dlib.face_recognition_model_v1(fr_path)
 
             self.__face_thread_info("Preparation to motion detection completed")
             return True
@@ -91,13 +87,16 @@ class FaceDetectionThread(QThread):
 
             x = motion_roi.roi[0]
             y = motion_roi.roi[1]
+            w = motion_roi.roi[2]
+            h = motion_roi.roi[3]
+
+            factor = self.__scale_factor
 
             img: np.ndarray = motion_roi.img
 
-            # filename = os.path.join(os.getcwd(), "roi", str(self.__frames_count) + ".jpg")
-            # cv2.imwrite(filename, img)
+            img_small = cv2.resize(img, (w // factor, h // factor))
 
-            b,g,r = cv2.split(img)
+            b,g,r = cv2.split(img_small)
             img_rgb = cv2.merge((r,g,b))
 
             dets = self.__detector(img_rgb, 1)
@@ -111,14 +110,17 @@ class FaceDetectionThread(QThread):
                 x_offset = x
                 y_offset = y
 
-                img_roi = img[roi.top():roi.bottom(), roi.left():roi.right()]
-                face_roi = RoiData(img_roi, (x_offset + roi.left(),
-                                             y_offset + roi.top(),
-                                             roi.right() - roi.left(),
-                                             roi.bottom() - roi.top()))
+                img_roi = img[(roi.top() * factor):(roi.bottom() * factor),
+                          (roi.left() * factor):(roi.right() * factor)]
 
-                # filename = os.path.join(os.getcwd(), "roi", "f_" + str(self.__frames_count) + ".jpg")
-                # cv2.imwrite(filename, img_roi)
+                face_roi = RoiData(img_roi, (x_offset + (roi.left() * factor),
+                                             y_offset + (roi.top() * factor),
+                                             (roi.right() * factor) - (roi.left() * factor),
+                                             (roi.bottom() * factor) - (roi.top() * factor)),
+                                   shape)
+
+                cv2.imshow("face", img_roi)
+                cv2.waitKey(1)
 
                 self.__faces_roi.append(face_roi)
         except Exception as ex:

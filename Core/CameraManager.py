@@ -47,7 +47,7 @@ class CameraManager(QObject):
 
         return img
 
-    def get_face_image(self) -> np.ndarray:
+    def get_face_roi(self) -> RoiData:
         img = self.__faces_roi.get()
 
         return img
