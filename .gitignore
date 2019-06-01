@@ -6,3 +6,5 @@
 *.pyproj
 /venv/
 .pyc
+output
+*.exe
