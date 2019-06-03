@@ -5,6 +5,8 @@
 .vs/
 *.pyproj
 /venv/
-.pyc
+*.pyc
 output
 *.exe
+*.code-workspace
+.vscode

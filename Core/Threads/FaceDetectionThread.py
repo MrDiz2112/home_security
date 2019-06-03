@@ -6,9 +6,9 @@ import numpy as np
 import cv2
 import dlib
 import logging
+import threading
 from collections import deque
 
-from PIL import Image
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from Core import CameraManager
@@ -33,6 +33,8 @@ class FaceDetectionThread(QThread):
         self.__scale_factor = 2
 
     def run(self):
+        threading.current_thread().name = "FaceDetectionThread"
+
         if self.__manager is None:
             self.__face_thread_warn("Manager is null!")
             return

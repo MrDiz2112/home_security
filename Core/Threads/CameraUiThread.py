@@ -1,6 +1,7 @@
 import logging
 
 import cv2
+import threading
 import numpy as np
 from typing import Callable, List, Tuple
 
@@ -32,6 +33,8 @@ class CameraUiThread(QThread):
         self.__manager.on_faces_roi_changed.connect(self.__update_faces_roi)
 
     def run(self):
+        threading.current_thread().name = "CameraUIThread"
+        
         self.__is_running = True
 
         self.__ui_thread_info("Start Camera UI thread")
@@ -46,6 +49,10 @@ class CameraUiThread(QThread):
             image = self.__get_qimage(frame)
 
             self.on_new_image.emit(image)
+
+    def stop(self):
+        self.__is_running = False
+        self.__ui_thread_info(f"Stopping UI Thread")
 
     def __get_qimage(self, image: np.ndarray) -> QImage:
         """

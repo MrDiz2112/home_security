@@ -4,6 +4,7 @@ import numpy as np
 
 import cv2
 import logging
+import threading
 from collections import deque
 
 from PyQt5.QtCore import QThread
@@ -28,6 +29,8 @@ class MotionDetectionThread(QThread):
         self.__motion_roi: list = []
 
     def run(self):
+        threading.current_thread().name = "MotionDetectionThread"
+
         if self.__manager is None:
             self.__motion_thread_warn("Manager is null!")
             return

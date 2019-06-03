@@ -6,9 +6,9 @@ import numpy as np
 import cv2
 import dlib
 import logging
+import threading
 from collections import deque
 
-from PIL import Image
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from Core import CameraManager
@@ -28,6 +28,8 @@ class RecognitionThread(QThread):
         self.__face_rec_model: dlib.face_recognition_model_v1 = None
 
     def run(self):
+        threading.current_thread().name = "RecognitionThread"
+
         if self.__manager is None:
             self.__recognition_warn("Manager is null!")
             return
@@ -43,7 +45,6 @@ class RecognitionThread(QThread):
 
         while self.__is_running:
             self.__recognize()
-            pass
 
         self.__recognition_info("Recognition stopped")
 

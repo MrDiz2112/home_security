@@ -2,6 +2,7 @@ import time
 
 import cv2
 import logging
+import threading
 import numpy as np
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QImage
@@ -20,6 +21,8 @@ class CameraThread(QThread):
         self.__frame_wait = 1/ fps
 
     def run(self):
+        threading.current_thread().name = "CameraThread"
+
         if self.__manager is None:
             self.__cam_thread_warn("Manager is null!")
             return

@@ -23,7 +23,7 @@ class MainWindowPresenter(QObject):
 
         self.__camera_ui_thread = CameraUiThread(self.__manager)
         self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path,
-                                         r"materials/thief5.mp4",
+                                         r"materials/thief3.mp4",
                                          fps,
                                          self.__manager)
 
@@ -44,6 +44,7 @@ class MainWindowPresenter(QObject):
         self.view.stopButton.setEnabled(True)
 
     def stop_camera(self):
+        self.__camera_ui_thread.stop()
         self.__cameraModel.stop_processing()
 
     def switch_mode(self):
