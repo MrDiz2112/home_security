@@ -30,7 +30,7 @@ def init_logger(now_date):
         os.makedirs("./log")
 
     # log_formatter = logging.Formatter('[%(asctime)s][%(threadName)s][%(levelname)s] %(message)s')
-    log_formatter = logging.Formatter('%(asctime)s [%(levelname)s]%(message)s')
+    log_formatter = logging.Formatter('[%(asctime)s][%(levelname)s]%(message)s')
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
 
@@ -45,5 +45,8 @@ def init_logger(now_date):
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as ex:
+        print(ex)
     cv2.destroyAllWindows()

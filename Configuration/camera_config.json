@@ -1,8 +1,10 @@
 {
+  "fps": 25.0,
+
   "cameras": [
     {
-      "number": 1,
-      "url": ""
+      "source": 0,
+      "name": "Main"
     }
   ]
 }

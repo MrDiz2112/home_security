@@ -1,7 +1,8 @@
 import logging
+import time
+from threading import Thread
 
 import cv2
-import threading
 import numpy as np
 from typing import Callable, List, Tuple
 
@@ -9,18 +10,16 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QImage
 
 from Core import CameraManager
+from Core.Data import RoiData
 
 
 class CameraUiThread(QThread):
     on_new_image = pyqtSignal(QImage)
 
-    def __init__(self, manager: CameraManager):
+    def __init__(self, fps: float):
         super().__init__()
 
-        self.__manager: CameraManager = manager
-
         self.__is_running = False
-        self.__get_frame: Callable[[], np.ndarray] = None
 
         self.__motions_roi_to_draw = []
         self.__faces_roi_to_draw = []
@@ -29,30 +28,45 @@ class CameraUiThread(QThread):
         self.__color_face = (0, 255, 182)
         self.__thickness = 2
 
-        self.__manager.on_motion_roi_changed.connect(self.__update_motion_roi)
-        self.__manager.on_faces_roi_changed.connect(self.__update_faces_roi)
+        self.__frame_wait = 1 / fps
+
+        self.__get_actual_data: Callable[[], Tuple[np.ndarray, List[RoiData]]] = None
 
     def run(self):
-        threading.current_thread().name = "CameraUIThread"
-        
-        self.__is_running = True
+        try:
+            self.__is_running = True
 
-        self.__ui_thread_info("Start Camera UI thread")
+            self.__ui_thread_info("Start Camera UI thread")
 
-        while self.__is_running:
-            #TODO: тащить из менеджера roi для прорисовки
-            frame = self.__manager.get_camera_image()
+            if self.__get_actual_data is None:
+                self.__ui_thread_warn("Caller is not assigned")
+                return
 
-            self.__draw_rect(frame, self.__motions_roi_to_draw, self.__color_motion)
-            self.__draw_rect(frame, self.__faces_roi_to_draw, self.__color_face)
+            while self.__is_running:
+                start_time = time.time()
 
-            image = self.__get_qimage(frame)
+                frame, roi_list = self.__get_actual_data()
 
-            self.on_new_image.emit(image)
+                if frame is None:
+                    continue
+
+                for i in range(len(roi_list)):
+                    roi = roi_list.pop()
+                    self.__draw_rect(frame, roi)
+
+                image = self.__get_qimage(frame)
+
+                self.on_new_image.emit(image)
+
+                end_time = time.time()
+
+                if end_time - start_time < self.__frame_wait:
+                    time.sleep(self.__frame_wait - (end_time - start_time))
+        except Exception as ex:
+            self.__ui_thread_error(f"{ex}")
 
     def stop(self):
         self.__is_running = False
-        self.__ui_thread_info(f"Stopping UI Thread")
 
     def __get_qimage(self, image: np.ndarray) -> QImage:
         """
@@ -70,15 +84,22 @@ class CameraUiThread(QThread):
         image = image.rgbSwapped()
         return image
 
-    def __draw_rect(self, img: np.ndarray, roi: List[Tuple[int, int, int, int]], color: Tuple[int, int, int]):
-        if len(roi) != 0:
-            for motion_roi in roi:
-                try:
-                    x,y,w,h = motion_roi
-                    if  x >= 0 and y >= 0 and w >= 0 and h >= 0:
-                        cv2.rectangle(img, (x,y), (x+w, y+h), color, self.__thickness)
-                except Exception as ex:
-                    self.__manager_error(f"Failed to draw rect. {ex}")
+    def __draw_rect(self, img: np.ndarray, roi: RoiData):
+        if len(roi.roi) != 0:
+            try:
+                if  roi.is_motion:
+                    color = self.__color_motion
+                else:
+                    color = self.__color_face
+
+                x,y,w,h = roi.roi
+                if  x >= 0 and y >= 0 and w >= 0 and h >= 0:
+                    cv2.rectangle(img, (x,y), (x+w, y+h), color, self.__thickness)
+            except Exception as ex:
+                self.__ui_thread_error(f"Failed to draw rect. {ex}")
+
+    def assign_caller(self, callable_name: callable):
+        self.__get_actual_data = callable_name
 
     def __update_motion_roi(self):
         self.__motions_roi_to_draw = self.__manager.get_motions_roi_to_draw()[:]

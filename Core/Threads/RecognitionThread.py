@@ -1,4 +1,6 @@
 import os
+from queue import Queue
+from threading import Thread
 from typing import List, Tuple
 
 import numpy as np
@@ -6,9 +8,9 @@ import numpy as np
 import cv2
 import dlib
 import logging
-import threading
 from collections import deque
 
+from PIL import Image
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from Core import CameraManager
@@ -16,66 +18,35 @@ from Core.Data import RoiData
 from Core.Utils import ImageOperations as IOps
 
 
-class RecognitionThread(QThread):
+class RecognitionThread(Thread):
     on_prepare_finished = pyqtSignal()
 
-    def __init__(self, manager: CameraManager):
+    def __init__(self, frames: Queue, face_rec_model: dlib.face_recognition_model_v1):
         super().__init__()
 
-        self.__manager: CameraManager = manager
         self.__is_running: bool = False
 
-        self.__face_rec_model: dlib.face_recognition_model_v1 = None
+        self.__frames: Queue = frames
+        self.__face_rec_model: dlib.face_recognition_model_v1 = face_rec_model
 
     def run(self):
-        threading.current_thread().name = "RecognitionThread"
-
-        if self.__manager is None:
-            self.__recognition_warn("Manager is null!")
-            return
+        self.name = "RecognitionThread"
 
         self.__is_running = True
-
-        if not self.__prepare_recognition():
-            self.__recognition_warn("Preparation to recognition is failed!")
-            return
-
-        self.__recognition_info("Start recognition")
-        self.on_prepare_finished.emit()
+        self.__recognition_info("Recognition started")
 
         while self.__is_running:
             self.__recognize()
 
         self.__recognition_info("Recognition stopped")
 
-    def stop(self):
-        self.__is_running = False
-        self.__recognition_info(f"Stopping recognition")
-
-    def __prepare_recognition(self) -> bool:
-        try:
-            fr_path = os.path.join(os.getcwd(), "Resources", "face_recognition_resnet.dat")
-
-            if not os.path.exists(fr_path):
-                self.__recognition_warn("Missing resource .dat files")
-                return False
-
-            self.__face_rec_model = dlib.face_recognition_model_v1(fr_path)
-
-            self.__recognition_info("Preparation to recognition completed")
-            return True
-
-        except Exception as ex:
-            self.__recognition_error(f"Error during preparation to recognition {ex}")
-            return False
-
-    def __recognize(self) -> List[RoiData]:
+    def __recognize(self):
         """
         Возвращает дескриптор обнаруженного лица
         :return:
         """
         try:
-            face_roi: RoiData = self.__manager.get_face_roi()
+            face_roi: RoiData = self.__frames.get()
 
             img: np.ndarray = face_roi.img
 
@@ -88,6 +59,8 @@ class RecognitionThread(QThread):
         except Exception as ex:
             self.__recognition_error(f"{ex}")
 
+    def stop(self):
+        self.__is_running = False
 
     def __recognition_info(self, msg:str):
         message = f"[FaceDetectionThread] {msg}"

@@ -1,8 +1,9 @@
 import time
+from queue import Queue
+from threading import Thread
 
 import cv2
 import logging
-import threading
 import numpy as np
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QImage
@@ -10,39 +11,39 @@ from PyQt5.QtGui import QImage
 from Core import CameraManager
 
 
-class CameraThread(QThread):
-    def __init__(self, cam_port: int, fps: float, manager: CameraManager):
+class CameraThread(Thread):
+    def __init__(self, camera_source, fps: float):
         super().__init__()
 
+        self.__actual_frame = None
+
         self.__cam = None
-        self.__manager: CameraManager = manager
         self.__is_running: bool = False
-        self.__cam_port: int = cam_port
-        self.__frame_wait = 1/ fps
+        self.__camera_source = camera_source
+        self.__frame_wait = 1 / fps
+
+    def get_actual_frame(self) -> np.ndarray:
+        if self.__actual_frame is None:
+            return None
+
+        img = self.__actual_frame[:]
+        self.__actual_frame = None
+        return img
 
     def run(self):
-        threading.current_thread().name = "CameraThread"
-
-        if self.__manager is None:
-            self.__cam_thread_warn("Manager is null!")
-            return
-
-        self.__is_running = True
-        self.__cam_thread_info(f"Camera {self.__cam_port} is running")
+        self.__cam_thread_info(f"Camera {self.__camera_source} is running")
 
         if not self.__open():
-            raise Exception(f"Failed to open camera {self.__cam_port}")
+            raise Exception(f"Failed to open camera {self.__camera_source}")
 
         self.__cam_thread_info(f"Start frame grabber")
 
         while self.__is_running:
             start_time = time.time()
-
             res, frame = self.__cam.read()
 
             if res:
-                self.__manager.put_camera_frame(frame)
-
+                self.__actual_frame = frame
                 end_time = time.time()
 
                 if end_time - start_time < self.__frame_wait:
@@ -64,21 +65,21 @@ class CameraThread(QThread):
                     self.__cam_thread_info("Connection restored")
                     break
 
-                self.sleep(5)
+                time.sleep(5)
 
     def __open(self):
         cam = None
 
         try:
-            cam = cv2.VideoCapture(self.__cam_port)
+            cam = cv2.VideoCapture(self.__camera_source)
         except Exception as ex:
-            self.__cam_thread_error(f"Failed to open camera {self.__cam_port}. {ex}")
+            self.__cam_thread_error(f"Failed to open camera {self.__camera_source}. {ex}")
             return False
         finally:
             self.__cam = cam
 
         if not cam.isOpened():
-            self.__cam_thread_warn(f"Camera {self.__cam_port} isn't open")
+            self.__cam_thread_warn(f"Camera {self.__camera_source} isn't open")
             return False
 
         res, img = cam.read()
@@ -86,34 +87,36 @@ class CameraThread(QThread):
             self.__cam_thread_warn("Invalid frame on init")
             return False
 
-        self.__cam_thread_info(f"Camera {self.__cam_port} opened")
+        self.__cam_thread_info(f"Camera {self.__camera_source} opened")
+
+        self.__is_running = True
 
         return True
 
     def stop(self):
         self.__is_running = False
 
-        self.__cam_thread_info(f"Camera {self.__cam_port} stopped")
+        self.__cam_thread_info(f"Camera {self.__camera_source} stopped")
         if self.__cam is not None:
             self.__cam.release()
 
-        self.__cam_thread_info(f"Camera {self.__cam_port} released")
+        self.__cam_thread_info(f"Camera {self.__camera_source} released")
 
     def __release(self):
-        self.__cam_thread_info(f"Releasing camera {self.__cam_port}")
+        self.__cam_thread_info(f"Releasing camera {self.__camera_source}")
         self.stop()
 
     def __str__(self):
-        return f"Camera {self.__cam_port}"
+        return f"Camera {self.__camera_source}"
 
     def __cam_thread_info(self, msg:str):
-        message = f"[Camera {self.__cam_port} Thread] {msg}"
+        message = f"[Camera {self.__camera_source} Thread] {msg}"
         logging.info(message)
 
     def __cam_thread_warn(self, msg:str):
-        message = f"[Camera {self.__cam_port} Thread] {msg}"
+        message = f"[Camera {self.__camera_source} Thread] {msg}"
         logging.warning(message)
 
     def __cam_thread_error(self, msg:str):
-        message = f"[Camera {self.__cam_port} Thread] {msg}"
+        message = f"[Camera {self.__camera_source} Thread] {msg}"
         logging.error(message)

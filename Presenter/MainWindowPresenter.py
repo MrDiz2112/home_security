@@ -21,31 +21,35 @@ class MainWindowPresenter(QObject):
 
         fps = 25.0
 
-        self.__camera_ui_thread = CameraUiThread(self.__manager)
-        self.__cameraModel = CameraModel(FaceDetectionConfig.cascade_path,
-                                         r"materials/thief3.mp4",
-                                         fps,
-                                         self.__manager)
-
-        self.__cameraModel.on_camera_thread_finished.connect(self.__reset_camera)
+        self.__camera_ui_thread = CameraUiThread(fps)
+        self.__camera_ui_thread.assign_caller(self.__manager.get_first_camera_data)
 
     def start_camera(self):
-        self.__presenter_info("Start camera init")
+        try:
+            self.__presenter_info("Start init")
 
-        is_display_processing = self.view.displayProcessingCheckBox.isChecked()
-        self.__cameraModel.start_processing(is_display_processing)
+            is_display_processing = self.view.displayProcessingCheckBox.isChecked()
+            self.__manager.start_processing()
 
-        self.__presenter_info("Start Camera UI Thread")
+            self.__presenter_info("Start Camera UI Thread")
 
-        self.__camera_ui_thread.on_new_image.connect(self.__update_camera_widget_image)
-        self.__camera_ui_thread.start(QThread.HighestPriority)
+            self.__camera_ui_thread.on_new_image.connect(self.__update_camera_widget_image)
+            self.__camera_ui_thread.start()
 
-        self.view.startButton.setEnabled(False)
-        self.view.stopButton.setEnabled(True)
+            self.view.startButton.setEnabled(False)
+            self.view.stopButton.setEnabled(True)
+        except Exception as ex:
+            self.__presenter_error(f"Cannot start camera {ex}")
 
     def stop_camera(self):
-        self.__camera_ui_thread.stop()
-        self.__cameraModel.stop_processing()
+        try:
+            self.__manager.stop_processing()
+            self.__camera_ui_thread.stop()
+
+            self.view.startButton.setEnabled(True)
+            self.view.stopButton.setEnabled(False)
+        except Exception as ex:
+            self.__presenter_error(f"{ex}")
 
     def switch_mode(self):
         pass
@@ -60,8 +64,6 @@ class MainWindowPresenter(QObject):
 
     @pyqtSlot()
     def __reset_camera(self):
-        self.__manager.clear_manager()
-
         self.view.startButton.setEnabled(True)
         self.view.stopButton.setEnabled(False)
 
