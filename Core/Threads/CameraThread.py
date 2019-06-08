@@ -1,3 +1,4 @@
+import threading
 import time
 from queue import Queue
 from threading import Thread
@@ -12,9 +13,10 @@ from Core import CameraManager
 
 
 class CameraThread(Thread):
-    def __init__(self, camera_source, fps: float):
+    def __init__(self, name: str, camera_source, fps: float):
         super().__init__()
 
+        self.__name = name
         self.__actual_frame = None
 
         self.__cam = None
@@ -31,6 +33,8 @@ class CameraThread(Thread):
         return img
 
     def run(self):
+        threading.current_thread().name = "CameraThread"
+
         self.__cam_thread_info(f"Camera {self.__camera_source} is running")
 
         if not self.__open():
@@ -110,13 +114,13 @@ class CameraThread(Thread):
         return f"Camera {self.__camera_source}"
 
     def __cam_thread_info(self, msg:str):
-        message = f"[Camera {self.__camera_source} Thread] {msg}"
+        message = f"[Camera {self.__name} Thread] {msg}"
         logging.info(message)
 
     def __cam_thread_warn(self, msg:str):
-        message = f"[Camera {self.__camera_source} Thread] {msg}"
+        message = f"[Camera {self.__name} Thread] {msg}"
         logging.warning(message)
 
     def __cam_thread_error(self, msg:str):
-        message = f"[Camera {self.__camera_source} Thread] {msg}"
+        message = f"[Camera {self.__name} Thread] {msg}"
         logging.error(message)

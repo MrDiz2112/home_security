@@ -1,4 +1,5 @@
 import logging
+import threading
 import time
 from threading import Thread
 
@@ -34,6 +35,7 @@ class CameraUiThread(QThread):
 
     def run(self):
         try:
+            threading.current_thread().name = "UiThread"
             self.__is_running = True
 
             self.__ui_thread_info("Start Camera UI thread")

@@ -1,5 +1,6 @@
 import logging
 import os
+import threading
 from collections import deque
 from queue import Queue
 from threading import Thread
@@ -47,6 +48,8 @@ class FrameProcessing:
         return self.__roi_list
 
     def __start_processing(self):
+        threading.current_thread().name = "ProcessingThread"
+
         while self.__is_running:
             self.__process()
 
