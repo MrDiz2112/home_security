@@ -1,8 +1,9 @@
 import logging
+import sys
 
 import Views.Widgets
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 
 from Presenter import MainWindowPresenter
@@ -33,6 +34,9 @@ class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
     def stop_video(self):
         self.__presenter.stop_camera()
         self.__ui_info("Stop video recording")
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.__presenter.stop_camera()
 
     def __ui_info(self, msg:str):
         message = f"[UI] {msg}"
