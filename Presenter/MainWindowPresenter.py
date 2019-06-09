@@ -8,7 +8,7 @@ from Core.Config import CameraConfig
 from Core.Threads import CameraUiThread
 from Models import CameraModel
 
-from Views import MainWindowView
+from Views import MainWindowView, FacesWindowView
 
 
 class MainWindowPresenter(QObject):
@@ -53,8 +53,12 @@ class MainWindowPresenter(QObject):
         except Exception as ex:
             self.__presenter_error(f"{ex}")
 
-    def switch_mode(self):
-        pass
+    def show_database(self):
+        try:
+            database = FacesWindowView.FacesWindowView()
+            database.exec_()
+        except Exception as ex:
+            self.__presenter_error(f"Failed to open database. {ex}")
 
     @pyqtSlot(QImage)
     def __update_camera_widget_image(self, image):

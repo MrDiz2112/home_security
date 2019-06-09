@@ -10,6 +10,7 @@ import cv2
 import dlib
 import numpy as np
 
+from Core.Config import ResourcesConfig
 from Core.Data import RoiData
 from Core.Threads import RecognitionThread
 from Core.Utils import ImageOperations as IOps
@@ -29,6 +30,8 @@ class FrameProcessing:
         self.__frames_to_process = 10
         self.__connect_all_contours = False
         self.__motion_roi = []
+
+        self.__resources_config = ResourcesConfig()
 
         # Face
         self.__faces_roi = []
@@ -98,7 +101,7 @@ class FrameProcessing:
 
     def __prepare_face_detection(self) -> bool:
         try:
-            sp_path = os.path.join(os.getcwd(), "Resources", "face_shape_predictor.dat")
+            sp_path = self.__resources_config.shape_predictor
 
             if not os.path.exists(sp_path):
                 self.__processing_warn("Missing resource .dat files")
@@ -115,7 +118,7 @@ class FrameProcessing:
 
     def __prepare_recognition(self) -> bool:
         try:
-            fr_path = os.path.join(os.getcwd(), "Resources", "face_recognition_resnet.dat")
+            fr_path = self.__resources_config.recognition_resnet
 
             if not os.path.exists(fr_path):
                 self.__processing_warn("Missing resource .dat files")

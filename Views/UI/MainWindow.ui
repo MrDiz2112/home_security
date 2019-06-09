@@ -38,64 +38,6 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="cameraSettingsLayout">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetMinimumSize</enum>
-        </property>
-        <item>
-         <widget class="QCheckBox" name="RoiCheckBox">
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Отобразить ROI</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="newRoiButton">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>250</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Новая область</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="editRoiButton">
-          <property name="minimumSize">
-           <size>
-            <width>180</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>250</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Редактировать</string>
-          </property>
-         </widget>
-        </item>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -196,12 +138,18 @@
          </size>
         </property>
         <property name="text">
-         <string>База лиц</string>
+         <string>База данных лиц</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="settingsButton">
+        <property name="maximumSize">
+         <size>
+          <width>250</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="text">
          <string>Настройка обработки</string>
         </property>
@@ -280,7 +228,7 @@
      <x>0</x>
      <y>0</y>
      <width>1000</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

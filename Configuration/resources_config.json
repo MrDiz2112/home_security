@@ -1,0 +1,4 @@
+{
+  "shape_predictor": "Resources/face_shape_predictor.dat",
+  "recognition_resnet": "Resources/face_recognition_resnet.dat"
+}

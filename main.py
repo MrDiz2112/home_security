@@ -1,13 +1,12 @@
+import logging
 import os
 import sys
-import logging
 
+from PyQt5 import QtWidgets
 from datetime import datetime
 
-import cv2
-import numpy as np
-from PyQt5 import QtWidgets
-from Views import MainWindowView
+from Core.DatabaseWorker import DatabaseWorker
+from Views import MainWindowView, FacesWindowView
 
 
 def main():
@@ -17,7 +16,7 @@ def main():
 
     app = QtWidgets.QApplication(sys.argv)
 
-    main_window = MainWindowView()
+    main_window = MainWindowView.MainWindowView()
     main_window.show()
 
     logging.info("[Main] Application started!")
@@ -43,10 +42,8 @@ def init_logger(now_date):
     file_handler.setFormatter(log_formatter)
     root_logger.addHandler(file_handler)
 
+    db_worker = DatabaseWorker()
+    db_worker.create_db()
 
 if __name__ == '__main__':
-    try:
-        main()
-    except Exception as ex:
-        print(ex)
-    cv2.destroyAllWindows()
+    main()

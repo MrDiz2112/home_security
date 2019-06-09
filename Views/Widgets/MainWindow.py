@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/Users/mrdiz/Projects/Python/home_security/Views/UI/MainWindow.ui'
+# Form implementation generated from reading ui file 'Views/UI/MainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -32,27 +32,9 @@ class Ui_MainWindow(object):
         self.cameraImage.setAlignment(QtCore.Qt.AlignCenter)
         self.cameraImage.setObjectName("cameraImage")
         self.cameraImageLayout.addWidget(self.cameraImage)
-        self.cameraLayout.addLayout(self.cameraImageLayout)
-        self.cameraSettingsLayout = QtWidgets.QHBoxLayout()
-        self.cameraSettingsLayout.setSizeConstraint(QtWidgets.QLayout.SetMinimumSize)
-        self.cameraSettingsLayout.setObjectName("cameraSettingsLayout")
-        self.RoiCheckBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.RoiCheckBox.setMaximumSize(QtCore.QSize(200, 16777215))
-        self.RoiCheckBox.setObjectName("RoiCheckBox")
-        self.cameraSettingsLayout.addWidget(self.RoiCheckBox)
-        self.newRoiButton = QtWidgets.QPushButton(self.centralwidget)
-        self.newRoiButton.setMinimumSize(QtCore.QSize(180, 0))
-        self.newRoiButton.setMaximumSize(QtCore.QSize(250, 16777215))
-        self.newRoiButton.setObjectName("newRoiButton")
-        self.cameraSettingsLayout.addWidget(self.newRoiButton)
-        self.editRoiButton = QtWidgets.QPushButton(self.centralwidget)
-        self.editRoiButton.setMinimumSize(QtCore.QSize(180, 0))
-        self.editRoiButton.setMaximumSize(QtCore.QSize(250, 16777215))
-        self.editRoiButton.setObjectName("editRoiButton")
-        self.cameraSettingsLayout.addWidget(self.editRoiButton)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.cameraSettingsLayout.addItem(spacerItem)
-        self.cameraLayout.addLayout(self.cameraSettingsLayout)
+        self.cameraImageLayout.addItem(spacerItem)
+        self.cameraLayout.addLayout(self.cameraImageLayout)
         self.horizontalLayout.addLayout(self.cameraLayout)
         self.settingsLayout = QtWidgets.QVBoxLayout()
         self.settingsLayout.setObjectName("settingsLayout")
@@ -85,6 +67,7 @@ class Ui_MainWindow(object):
         self.databaseButton.setObjectName("databaseButton")
         self.settingsLayout.addWidget(self.databaseButton)
         self.settingsButton = QtWidgets.QPushButton(self.centralwidget)
+        self.settingsButton.setMaximumSize(QtCore.QSize(250, 16777215))
         self.settingsButton.setObjectName("settingsButton")
         self.settingsLayout.addWidget(self.settingsButton)
         self.notificationButton = QtWidgets.QPushButton(self.centralwidget)
@@ -115,7 +98,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.settingsLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1000, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -128,12 +111,9 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Home Security"))
-        self.RoiCheckBox.setText(_translate("MainWindow", "Отобразить ROI"))
-        self.newRoiButton.setText(_translate("MainWindow", "Новая область"))
-        self.editRoiButton.setText(_translate("MainWindow", "Редактировать"))
         self.startButton.setText(_translate("MainWindow", "Старт"))
         self.stopButton.setText(_translate("MainWindow", "Стоп"))
-        self.databaseButton.setText(_translate("MainWindow", "База лиц"))
+        self.databaseButton.setText(_translate("MainWindow", "База данных лиц"))
         self.settingsButton.setText(_translate("MainWindow", "Настройка обработки"))
         self.notificationButton.setText(_translate("MainWindow", "Настройка оповещений"))
         self.displayProcessingCheckBox.setText(_translate("MainWindow", "Показать результат обработки"))
