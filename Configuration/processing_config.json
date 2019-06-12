@@ -1,0 +1,6 @@
+{
+  "detect_motion": true,
+  "detect_faces": true,
+  "recognize_faces": true,
+  "display_result": true
+}

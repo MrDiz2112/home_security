@@ -14,6 +14,7 @@ from PIL import Image
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from Core import CameraManager
+from Core.Config import ProcessingConfig
 from Core.Data import RoiData
 from Core.Utils import ImageOperations as IOps
 
@@ -23,6 +24,8 @@ class RecognitionThread(Thread):
 
     def __init__(self, frames: Queue, face_rec_model: dlib.face_recognition_model_v1):
         super().__init__()
+
+        self.__config =  ProcessingConfig()
 
         self.__is_running: bool = False
 
@@ -42,11 +45,14 @@ class RecognitionThread(Thread):
 
     def __recognize(self):
         """
-        Возвращает дескриптор обнаруженного лица
+        Recognize face and return it's descriptor
         :return:
         """
         try:
             face_roi: RoiData = self.__frames.get()
+
+            if not self.__config.recognize_faces:
+                return
 
             img: np.ndarray = face_roi.img
 

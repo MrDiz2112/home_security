@@ -11,6 +11,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QImage
 
 from Core import CameraManager
+from Core.Config import ProcessingConfig
 from Core.Data import RoiData
 
 
@@ -19,6 +20,8 @@ class CameraUiThread(QThread):
 
     def __init__(self, fps: float):
         super().__init__()
+
+        self.__config = ProcessingConfig()
 
         self.__is_running = False
 
@@ -52,9 +55,10 @@ class CameraUiThread(QThread):
                 if frame is None:
                     continue
 
-                for i in range(len(roi_list)):
-                    roi = roi_list.pop()
-                    self.__draw_rect(frame, roi)
+                if self.__config.display_result:
+                    for i in range(len(roi_list)):
+                        roi = roi_list.pop()
+                        self.__draw_rect(frame, roi)
 
                 image = self.__get_qimage(frame)
 

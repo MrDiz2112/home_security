@@ -80,11 +80,6 @@ class Ui_MainWindow(object):
         self.notificationButton.setMaximumSize(QtCore.QSize(250, 16777215))
         self.notificationButton.setObjectName("notificationButton")
         self.settingsLayout.addWidget(self.notificationButton)
-        self.displayProcessingCheckBox = QtWidgets.QCheckBox(self.centralwidget)
-        self.displayProcessingCheckBox.setEnabled(True)
-        self.displayProcessingCheckBox.setChecked(True)
-        self.displayProcessingCheckBox.setObjectName("displayProcessingCheckBox")
-        self.settingsLayout.addWidget(self.displayProcessingCheckBox)
         self.notificationCheckBox = QtWidgets.QCheckBox(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -116,7 +111,6 @@ class Ui_MainWindow(object):
         self.databaseButton.setText(_translate("MainWindow", "База данных лиц"))
         self.settingsButton.setText(_translate("MainWindow", "Настройка обработки"))
         self.notificationButton.setText(_translate("MainWindow", "Настройка оповещений"))
-        self.displayProcessingCheckBox.setText(_translate("MainWindow", "Показать результат обработки"))
         self.notificationCheckBox.setText(_translate("MainWindow", "Включить оповещения"))
 
 

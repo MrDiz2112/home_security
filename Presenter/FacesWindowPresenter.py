@@ -62,15 +62,15 @@ class FacesWindowPresenter:
             self.__presenter_error(f"Cannot display table. {ex}")
 
     def __presenter_info(self, msg: str):
-        message = f"[MainWindowPresenter] {msg}"
+        message = f"[FacesWindowPresenter] {msg}"
         logging.info(message)
 
     def __presenter_warn(self, msg: str):
-        message = f"[MainWindowPresenter] {msg}"
+        message = f"[FacesWindowPresenter] {msg}"
         logging.warning(message)
 
     def __presenter_error(self, msg: str):
-        message = f"[MainWindowPresenter] {msg}"
+        message = f"[FacesWindowPresenter] {msg}"
         logging.error(message)
 
 

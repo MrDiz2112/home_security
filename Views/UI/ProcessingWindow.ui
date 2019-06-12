@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>processingWindow</class>
- <widget class="QWidget" name="processingWindow">
+ <widget class="QDialog" name="processingWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>255</width>
-    <height>113</height>
+    <width>220</width>
+    <height>150</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>220</width>
+    <height>150</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>220</width>
+    <height>150</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Настройка обработки</string>
@@ -25,7 +37,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="faceDetectioncheckBox">
+    <widget class="QCheckBox" name="faceCheckBox">
      <property name="text">
       <string>Включить поиск лиц</string>
      </property>
@@ -38,6 +50,19 @@
     <widget class="QCheckBox" name="recognitionCheckBox">
      <property name="text">
       <string>Включить распознавание лиц</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="displayProcessingCheckBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string>Показать результат обработки</string>
      </property>
      <property name="checked">
       <bool>true</bool>

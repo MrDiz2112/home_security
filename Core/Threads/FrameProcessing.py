@@ -10,7 +10,7 @@ import cv2
 import dlib
 import numpy as np
 
-from Core.Config import ResourcesConfig
+from Core.Config import ResourcesConfig, ProcessingConfig
 from Core.Data import RoiData
 from Core.Threads import RecognitionThread
 from Core.Utils import ImageOperations as IOps
@@ -20,6 +20,8 @@ class FrameProcessing:
     def __init__(self, name: str, get_actual_frame: Callable[[] , np.ndarray]):
         super().__init__()
 
+        self.__config = ProcessingConfig()
+
         self.__name = name
         self.__get_actual_frame = get_actual_frame
         self.__roi_list: List[RoiData] = []
@@ -27,7 +29,7 @@ class FrameProcessing:
         # Motion
         self.__frames_deque: deque = deque()
         self.__motion_scale_factor = 8
-        self.__frames_to_process = 10
+        self.__frames_to_process = 7
         self.__connect_all_contours = False
         self.__motion_roi = []
 
@@ -138,11 +140,15 @@ class FrameProcessing:
 
         for motion_roi in motions:
 
-            self.__roi_list.append(motion_roi)
+            if self.__config.display_result:
+                self.__roi_list.append(motion_roi)
+
             faces = self.__detect_face(motion_roi)
 
             for face_roi in faces:
-                self.__roi_list.append(face_roi)
+                if self.__config.display_result:
+                    self.__roi_list.append(face_roi)
+
                 self.__faces.put(face_roi)
 
     def __detect_motion(self) -> List[RoiData]:
@@ -151,11 +157,22 @@ class FrameProcessing:
         :return:
         """
 
+        self.__motion_roi = []
+
         # TODO: если выключена обработка - возвращать весь кадр
         image_data = self.__get_actual_frame()
 
         if image_data is None:
             return []
+
+        if not self.__config.detect_motion:
+            x, y, w, h = (0,0, image_data.shape[1], image_data.shape[0])
+            img_roi = image_data[y:y + h, x:x + w]
+
+            motion_roi = RoiData(img_roi, (x, y, w, h))
+
+            self.__motion_roi.append(motion_roi)
+            return self.__motion_roi
 
         factor = self.__motion_scale_factor
 
@@ -166,7 +183,6 @@ class FrameProcessing:
         self.__frames_deque.appendleft(img_small)
 
         if len(self.__frames_deque) >= self.__frames_to_process:
-            self.__motion_roi = []
 
             try:
                 f0 = IOps.ConvertToGray(self.__frames_deque[0])
@@ -232,6 +248,11 @@ class FrameProcessing:
         :return:
         """
         self.__faces_roi = []
+
+        if not self.__config.detect_faces:
+            self.__faces_roi.append(motion_roi)
+            return self.__faces_roi
+
         try:
             # TODO: если выключена обработка - возвращать весь кадр
 
@@ -269,8 +290,8 @@ class FrameProcessing:
                                              (roi.bottom() * factor) - (roi.top() * factor)),
                                    shape, False)
 
-                cv2.imshow("face", img_roi)
-                cv2.waitKey(1)
+                # cv2.imshow("face", img_roi)
+                # cv2.waitKey(1)
 
                 self.__faces_roi.append(face_roi)
         except Exception as ex:

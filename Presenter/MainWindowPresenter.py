@@ -8,7 +8,7 @@ from Core.Config import CameraConfig
 from Core.Threads import CameraUiThread
 from Models import CameraModel
 
-from Views import MainWindowView, FacesWindowView
+from Views import MainWindowView, FacesWindowView, ProcessingWindowView
 
 
 class MainWindowPresenter(QObject):
@@ -27,7 +27,6 @@ class MainWindowPresenter(QObject):
         try:
             self.__presenter_info("Start init")
 
-            is_display_processing = self.view.displayProcessingCheckBox.isChecked()
             self.__manager.start_processing()
 
             self.__presenter_info("Start Camera UI Thread")
@@ -40,6 +39,9 @@ class MainWindowPresenter(QObject):
 
             self.view.startButton.setEnabled(False)
             self.view.stopButton.setEnabled(True)
+
+            self.view.databaseButton.setEnabled(False)
+            self.view.settingsButton.setEnabled(False)
         except Exception as ex:
             self.__presenter_error(f"Cannot start camera {ex}")
 
@@ -50,6 +52,9 @@ class MainWindowPresenter(QObject):
 
             self.view.startButton.setEnabled(True)
             self.view.stopButton.setEnabled(False)
+
+            self.view.databaseButton.setEnabled(True)
+            self.view.settingsButton.setEnabled(True)
         except Exception as ex:
             self.__presenter_error(f"{ex}")
 
@@ -59,6 +64,13 @@ class MainWindowPresenter(QObject):
             database.exec_()
         except Exception as ex:
             self.__presenter_error(f"Failed to open database. {ex}")
+
+    def show_processing_window(self):
+        try:
+            processing_window = ProcessingWindowView.ProcessingWindowView()
+            processing_window.exec_()
+        except Exception as ex:
+            self.__presenter_error(f"{ex}")
 
     @pyqtSlot(QImage)
     def __update_camera_widget_image(self, image):

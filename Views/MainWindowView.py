@@ -20,6 +20,7 @@ class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
         self.startButton.clicked.connect(self.start_video)
         self.stopButton.clicked.connect(self.stop_video)
         self.databaseButton.clicked.connect(self.show_database)
+        self.settingsButton.clicked.connect(self.show_processing_window)
 
         # Настройка виджетов
         self.cameraImage.setAutoFillBackground(True)
@@ -37,6 +38,9 @@ class MainWindowView (QtWidgets.QMainWindow, Views.Widgets.MainWindow):
 
     def show_database(self):
         self.__presenter.show_database()
+
+    def show_processing_window(self):
+        self.__presenter.show_processing_window()
 
     def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
         self.__presenter.stop_camera()
