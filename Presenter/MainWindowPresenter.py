@@ -8,7 +8,7 @@ from Core.Config import CameraConfig
 from Core.Threads import CameraUiThread
 from Models import CameraModel
 
-from Views import MainWindowView, FacesWindowView, ProcessingWindowView
+from Views import MainWindowView, FacesWindowView, ProcessingWindowView, NotificationWindowView
 
 
 class MainWindowPresenter(QObject):
@@ -42,6 +42,7 @@ class MainWindowPresenter(QObject):
 
             self.view.databaseButton.setEnabled(False)
             self.view.settingsButton.setEnabled(False)
+            self.view.notificationButton.setEnabled(False)
         except Exception as ex:
             self.__presenter_error(f"Cannot start camera {ex}")
 
@@ -55,6 +56,7 @@ class MainWindowPresenter(QObject):
 
             self.view.databaseButton.setEnabled(True)
             self.view.settingsButton.setEnabled(True)
+            self.view.notificationButton.setEnabled(True)
         except Exception as ex:
             self.__presenter_error(f"{ex}")
 
@@ -70,7 +72,14 @@ class MainWindowPresenter(QObject):
             processing_window = ProcessingWindowView.ProcessingWindowView()
             processing_window.exec_()
         except Exception as ex:
-            self.__presenter_error(f"{ex}")
+            self.__presenter_error(f"Failed to open processing window. {ex}")
+
+    def show_notification_window(self):
+        try:
+            notification_window = NotificationWindowView.NotificationWindowView()
+            notification_window.exec_()
+        except Exception as ex:
+            self.__presenter_error(f"Failed to open notification window. {ex}")
 
     @pyqtSlot(QImage)
     def __update_camera_widget_image(self, image):

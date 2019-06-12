@@ -20,6 +20,7 @@ class CameraUiThread(QThread):
 
     def __init__(self, fps: float):
         super().__init__()
+        self.setObjectName("CameraUiThread")
 
         self.__config = ProcessingConfig()
 
@@ -32,13 +33,13 @@ class CameraUiThread(QThread):
         self.__color_face = (0, 255, 182)
         self.__thickness = 2
 
+
         self.__frame_wait = 1 / fps
 
         self.__get_actual_data: Callable[[], Tuple[np.ndarray, List[RoiData]]] = None
 
     def run(self):
         try:
-            threading.current_thread().name = "UiThread"
             self.__is_running = True
 
             self.__ui_thread_info("Start Camera UI thread")

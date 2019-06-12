@@ -4,7 +4,7 @@
   "cameras": [
     {
       "name": "Main",
-      "source": "materials/thief5.mp4"
+      "source": 0
     }
   ]
 }

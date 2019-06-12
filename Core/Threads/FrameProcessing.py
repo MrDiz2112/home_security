@@ -1,6 +1,7 @@
 import logging
 import os
 import threading
+import time
 from collections import deque
 from queue import Queue
 from threading import Thread
@@ -22,9 +23,18 @@ class FrameProcessing:
 
         self.__config = ProcessingConfig()
 
+        # Notification
+        from Core import NotificationManager
+        self.__notification_manager = NotificationManager()
+        self.__notify_thread = None
+        self.__notify_thread_started = False
+        self.__new_roi_delay = 3  # seconds
+        self.__actual_frame = None
+
         self.__name = name
         self.__get_actual_frame = get_actual_frame
         self.__roi_list: List[RoiData] = []
+        self.__notify_roi = []
 
         # Motion
         self.__frames_deque: deque = deque()
@@ -138,8 +148,13 @@ class FrameProcessing:
     def __process(self):
         motions = self.__detect_motion()
 
-        for motion_roi in motions:
+        if motions and not self.__config.detect_faces \
+                and not self.__config.recognize_faces \
+                and self.__config.detect_motion:
+            self.__start_notify_thread("motion")
 
+
+        for motion_roi in motions:
             if self.__config.display_result:
                 self.__roi_list.append(motion_roi)
 
@@ -148,6 +163,10 @@ class FrameProcessing:
             for face_roi in faces:
                 if self.__config.display_result:
                     self.__roi_list.append(face_roi)
+
+                    if not self.__config.recognize_faces and self.__config.detect_faces:
+                        self.__notify_roi.append(face_roi.img[:])
+                        self.__start_notify_thread("face")
 
                 self.__faces.put(face_roi)
 
@@ -164,6 +183,8 @@ class FrameProcessing:
 
         if image_data is None:
             return []
+
+        self.__actual_frame = image_data[:]
 
         if not self.__config.detect_motion:
             x, y, w, h = (0,0, image_data.shape[1], image_data.shape[0])
@@ -278,17 +299,32 @@ class FrameProcessing:
                 shape : dlib.full_object_detection = self.__shape_predictor(img_rgb, d)
                 roi: dlib.rectangle = shape.rect
 
-                x_offset = x
-                y_offset = y
+                x_offset = x // factor
+                y_offset = y // factor
 
-                img_roi = img[(roi.top() * factor):(roi.bottom() * factor),
-                          (roi.left() * factor):(roi.right() * factor)]
 
-                face_roi = RoiData(img_roi, (x_offset + (roi.left() * factor),
-                                             y_offset + (roi.top() * factor),
-                                             (roi.right() * factor) - (roi.left() * factor),
-                                             (roi.bottom() * factor) - (roi.top() * factor)),
+                img_roi = img_small[:]
+
+                face_roi = RoiData(img_roi, ((x_offset + roi.left()) * factor,
+                                             (y_offset + roi.top()) * factor,
+                                             (roi.right() - roi.left()) * factor,
+                                             (roi.bottom() - roi.top()) * factor),
                                    shape, False)
+
+                # img_roi = img[(roi.top() * factor):(roi.bottom() * factor),
+                #           (roi.left() * factor):(roi.right() * factor)]
+                #
+                # win = dlib.image_window()
+                # win.clear_overlay()
+                # win.set_image(img_roi)
+                # win.add_overlay(shape)
+                # win.wait_until_closed()
+                #
+                # face_roi = RoiData(img_roi, (x_offset + (roi.left() * factor),
+                #                              y_offset + (roi.top() * factor),
+                #                              (roi.right() * factor) - (roi.left() * factor),
+                #                              (roi.bottom() * factor) - (roi.top() * factor)),
+                #                    shape, False)
 
                 # cv2.imshow("face", img_roi)
                 # cv2.waitKey(1)
@@ -298,6 +334,38 @@ class FrameProcessing:
             self.__processing_error(f"{ex}")
 
         return self.__faces_roi
+
+    def __start_notify_thread(self, notify_type: str):
+        if not self.__notify_thread_started:
+            self.__notify_thread_started = True
+            self.__notify_thread = Thread(target=self.__send_notification, args=(notify_type,))
+            self.__notify_thread.name = "NotificationThread"
+            self.__notify_thread.start()
+
+    def __send_notification(self, notify_type: str):
+        try:
+            if notify_type == 'motion':
+                while len(self.__notify_roi) < 5:
+                    self.__notify_roi.append(self.__actual_frame)
+                    time.sleep(self.__new_roi_delay)
+            else:
+                while True:
+                    if len(self.__notify_roi) >= 5:
+                        break
+
+                    before_sleep_len = len(self.__notify_roi)
+
+                    time.sleep(self.__new_roi_delay)
+
+                    if len(self.__notify_roi) == before_sleep_len:
+                        break
+
+            self.__notification_manager.send_notifications(notify_type, self.__notify_roi[:])
+        except Exception as ex:
+            self.__processing_error(f"Failed to send notification! {ex}")
+
+        self.__notify_roi = []
+        self.__notify_thread_started = False
 
     def __processing_info(self, msg:str):
         message = f"[FrameProcessing {self.__name}] {msg}"

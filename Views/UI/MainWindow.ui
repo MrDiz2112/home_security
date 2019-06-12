@@ -180,31 +180,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QCheckBox" name="notificationCheckBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>180</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Включить оповещения</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
    </layout>

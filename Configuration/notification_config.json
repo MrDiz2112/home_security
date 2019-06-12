@@ -1,0 +1,7 @@
+{
+  "notify_email": false,
+  "notify_telegram": false,
+  "email": "",
+  "password": "",
+  "bot_key": ""
+}

@@ -80,16 +80,6 @@ class Ui_MainWindow(object):
         self.notificationButton.setMaximumSize(QtCore.QSize(250, 16777215))
         self.notificationButton.setObjectName("notificationButton")
         self.settingsLayout.addWidget(self.notificationButton)
-        self.notificationCheckBox = QtWidgets.QCheckBox(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.notificationCheckBox.sizePolicy().hasHeightForWidth())
-        self.notificationCheckBox.setSizePolicy(sizePolicy)
-        self.notificationCheckBox.setMinimumSize(QtCore.QSize(180, 0))
-        self.notificationCheckBox.setMaximumSize(QtCore.QSize(250, 16777215))
-        self.notificationCheckBox.setObjectName("notificationCheckBox")
-        self.settingsLayout.addWidget(self.notificationCheckBox)
         self.horizontalLayout.addLayout(self.settingsLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -111,6 +101,5 @@ class Ui_MainWindow(object):
         self.databaseButton.setText(_translate("MainWindow", "База данных лиц"))
         self.settingsButton.setText(_translate("MainWindow", "Настройка обработки"))
         self.notificationButton.setText(_translate("MainWindow", "Настройка оповещений"))
-        self.notificationCheckBox.setText(_translate("MainWindow", "Включить оповещения"))
 
 

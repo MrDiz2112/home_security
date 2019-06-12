@@ -5,6 +5,7 @@ import sys
 from PyQt5 import QtWidgets
 from datetime import datetime
 
+from Core import NotificationManager
 from Core.DatabaseWorker import DatabaseWorker
 from Views import MainWindowView, FacesWindowView
 
