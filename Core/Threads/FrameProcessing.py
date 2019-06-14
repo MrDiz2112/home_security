@@ -212,12 +212,6 @@ class FrameProcessing:
 
                 movObject = IOps.CreateMovingObject(f0, f1, f2)
 
-                # cv2.imshow("f0", cv2.resize(f0, None, fx=0.2, fy=0.2))
-                # cv2.imshow("f1", cv2.resize(f1, None, fx=0.2, fy=0.2))
-                # cv2.imshow("f2", cv2.resize(f2, None, fx=0.2, fy=0.2))
-                #
-                # cv2.imshow("mov_object", movObject)
-
                 # Контуры
                 contours = cv2.findContours(np.copy(movObject), cv2.RETR_EXTERNAL,
                                             cv2.CHAIN_APPROX_SIMPLE)
@@ -310,24 +304,6 @@ class FrameProcessing:
                                              (roi.right() - roi.left()) * factor,
                                              (roi.bottom() - roi.top()) * factor),
                                    shape, False)
-
-                # img_roi = img[(roi.top() * factor):(roi.bottom() * factor),
-                #           (roi.left() * factor):(roi.right() * factor)]
-                #
-                # win = dlib.image_window()
-                # win.clear_overlay()
-                # win.set_image(img_roi)
-                # win.add_overlay(shape)
-                # win.wait_until_closed()
-                #
-                # face_roi = RoiData(img_roi, (x_offset + (roi.left() * factor),
-                #                              y_offset + (roi.top() * factor),
-                #                              (roi.right() * factor) - (roi.left() * factor),
-                #                              (roi.bottom() * factor) - (roi.top() * factor)),
-                #                    shape, False)
-
-                # cv2.imshow("face", img_roi)
-                # cv2.waitKey(1)
 
                 self.__faces_roi.append(face_roi)
         except Exception as ex:

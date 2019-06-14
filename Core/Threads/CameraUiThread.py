@@ -1,6 +1,7 @@
 import logging
 import threading
 import time
+from collections import deque
 from threading import Thread
 
 import cv2
@@ -23,6 +24,8 @@ class CameraUiThread(QThread):
         self.setObjectName("CameraUiThread")
 
         self.__config = ProcessingConfig()
+
+        self.__frames_to_wait = deque()
 
         self.__is_running = False
 
@@ -56,12 +59,19 @@ class CameraUiThread(QThread):
                 if frame is None:
                     continue
 
+                self.__frames_to_wait.appendleft(frame)
+
+                if len(self.__frames_to_wait) < 5:
+                    continue
+
+                actual_frame = self.__frames_to_wait.pop()
+
                 if self.__config.display_result:
                     for i in range(len(roi_list)):
                         roi = roi_list.pop()
-                        self.__draw_rect(frame, roi)
+                        self.__draw_rect(actual_frame, roi)
 
-                image = self.__get_qimage(frame)
+                image = self.__get_qimage(actual_frame)
 
                 self.on_new_image.emit(image)
 
