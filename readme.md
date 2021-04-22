@@ -4,7 +4,7 @@
 
 ![Imgur](https://i.imgur.com/Wmvv9yV.png)
 
-## Основные возможности
+## About
 
 * Different input sources: 
     * camera by id
