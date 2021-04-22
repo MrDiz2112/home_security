@@ -22,8 +22,8 @@ Settings stored in folder `Configuration`
 * `camera_config.json`
     * `fps` - how quickly the source will be read
     * `cameras` - list of cameras
-        * `name` - имя, используемое в логе
-        * `source` - источник (порт, путь)
+        * `name` - name for log
+        * `source` - port or path
 * `notification_config.json` 
     * `password` - application key for GMail
     * `bot_key` - API-KEY bot `@alarmer_bot`
